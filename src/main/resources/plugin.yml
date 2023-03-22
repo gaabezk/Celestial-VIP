@@ -1,0 +1,11 @@
+name: CelestialVIP
+version: '${project.version}'
+main: br.com.celestialvip.CelestialVIP
+api-version: 1.19
+commands:
+  celestialvip:
+    description: Recarrega o CelestialVIP
+    usage: /celestialvip reload
+    permission: celestialvip.reload
+    aliases: [cv, celestial-vip]
+

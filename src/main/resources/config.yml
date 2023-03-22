@@ -1,0 +1,73 @@
+config:
+  language: 'pt-BR'
+  prefix: '&6[CelestialVIP]'
+  announce:
+    active: true
+    # types: chat, actionbar, title, bossbar
+    type: 'chat'
+    message: '&a%player% &6acaba de ativar o %tag%.'
+  key-size: 15
+  database:
+    # 'mysql' or 'postgresql'
+    type: 'mysql'
+    host: 'localhost'
+    port: '3306'
+    database: 'teste'
+    user: 'root'
+    password: '1234'
+    tb_prefix: 'celestialvip_'
+  mercadopago:
+    CLIENT_ID: CLIENT_ID
+    CLIENT_SECRET: CLIENT_SECRET
+  #
+  #   [console] = comando é executado pelo console.
+  #   [player] = comando é executado pelo player.
+  #   [message] = mensagem é enviada para o player.
+  #   %player% = o nome do jogador aparecerá no lugar.
+  #   %value% = quantidade de cash aparecerá no lugar.
+  #   %tag% = tag do vip escolhida aparecerá no lugar.
+  vips:
+    - group-name: 'diamond'
+      tag: '&bVIP DIAMOND'
+      expires: true
+      commands-after-expiration:
+        - '[console] lp user %player% parent set default'
+      activation-commands:
+        - '[console] give %player% netherite_sword 1'
+        - '[console] give %player% netherite_helmet 1'
+        - '[console] give %player% netherite_chestplate 1'
+        - '[console] give %player% netherite_leggings 1'
+        - '[console] give %player% netherite_boots 1'
+        - '[console] eco give %player% 1000'
+    #
+    - group-name: 'gold'
+      tag: '&eVIP GOLD'
+      expires: true
+      commands-after-expiration:
+        - '[console] lp user %player% parent set default'
+      activation-commands:
+        - '[console] give %player% netherite_sword 1'
+        - '[console] give %player% netherite_helmet 1'
+        - '[console] give %player% netherite_chestplate 1'
+        - '[console] give %player% netherite_leggings 1'
+        - '[console] give %player% netherite_boots 1'
+        - '[console] eco give %player% 500'
+    #
+    - group-name: 'iron'
+      tag: '&2VIP IRON'
+      expires: true
+      after-expiration-commands:
+        - '[console] lp user %player% parent set default '
+      activation-commands:
+        - '[console] give %player% netherite_sword 1'
+        - '[console] give %player% netherite_helmet 1'
+        - '[console] give %player% netherite_chestplate 1'
+        - '[console] give %player% netherite_leggings 1'
+        - '[console] give %player% netherite_boots 1'
+        - '[console] eco give %player% 100'
+  #
+  # Use %value% como parametro para a quantidade de cash.
+  cash:
+    activation-commands:
+      - '[console] cash set %player% %value%'
+      - '[message] voce comprou %value% em cash'
