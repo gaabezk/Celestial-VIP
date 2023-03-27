@@ -1,6 +1,7 @@
 package br.com.celestialvip;
 
 import br.com.celestialvip.data.DatabaseManager;
+import br.com.celestialvip.services.PlayerService;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -10,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
 
     DatabaseManager databaseManager = new DatabaseManager(getConfig());
+    PlayerService playerService = new PlayerService(databaseManager.getDataSource());
 
     @Override
     public void onEnable() {
@@ -28,6 +30,7 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
                 saveDefaultConfig();
                 reloadConfig();
                 databaseManager.reload(getConfig());
+                playerService.reload(databaseManager.getDataSource());
                 System.gc();
             }catch (Exception e){
                 sender.sendMessage(e.getMessage());
