@@ -1,32 +1,45 @@
 package br.com.celestialvip;
 
 import br.com.celestialvip.data.DatabaseManager;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class CelestialVIP extends JavaPlugin {
+
+public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
+
+    DatabaseManager databaseManager = new DatabaseManager(getConfig());
 
     @Override
     public void onEnable() {
         getLogger().info("\033[92mBy: gabezk | Obrigado por usar!\033[0m");
         saveDefaultConfig(); // cria o arquivo de configuração padrão se ele não existir
-        DatabaseManager databaseManager = new DatabaseManager(getConfig());
+        getCommand("celestialvip").setExecutor(this);
+    }
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-
-//        try {
-//            databaseManager.savePlayerData(new PlayerData("teste-era-pra-ser-uuidfthfh","gabezkdd_"));
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//        try {
-//            getLogger().info(databaseManager.loadPlayerData("gabezk_").toString());
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-
+        if (command.getName()
+                .equalsIgnoreCase("celestialvip") && args
+                .length == 1 && args[0]
+                .equalsIgnoreCase("reload")) {
+            try {
+                saveDefaultConfig();
+                reloadConfig();
+                databaseManager.reload(getConfig());
+                System.gc();
+            }catch (Exception e){
+                sender.sendMessage(e.getMessage());
+            }
+            sender.sendMessage("Configurações recarregadas com sucesso!");
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("Plugin desativado!");
+        getLogger().info("\033[91mPlugin desativado!\033[0m");
     }
 }

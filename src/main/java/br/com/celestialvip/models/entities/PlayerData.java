@@ -12,15 +12,6 @@ import java.sql.SQLException;
 @AllArgsConstructor
 @ToString
 public class PlayerData {
-    private String uuid;
     private String nick;
-    public void save(FileConfiguration config) throws SQLException {
-        DatabaseManager databaseManager = new DatabaseManager(config);
-        databaseManager.savePlayerData(this);
-    }
-
-    public static PlayerData load(String playerName, FileConfiguration config) throws SQLException {
-        DatabaseManager databaseManager = new DatabaseManager(config);
-        return databaseManager.loadPlayerData(playerName);
-    }
+    private String uuid;
 }

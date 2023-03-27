@@ -9,12 +9,12 @@ config:
   key-size: 15
   database:
     # 'mysql' or 'postgresql'
-    type: 'mysql'
+    type: 'BLANK_'
     host: 'localhost'
     port: '3306'
     database: 'teste'
     user: 'root'
-    password: '1234'
+    password: 'password'
     tb_prefix: 'celestialvip_'
   mercadopago:
     CLIENT_ID: CLIENT_ID
