@@ -1,26 +1,35 @@
 package br.com.celestialvip;
 
 import br.com.celestialvip.data.DatabaseManager;
-import br.com.celestialvip.services.PlayerService;
+import br.com.celestialvip.services.VipKeyService;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
 
     DatabaseManager databaseManager = new DatabaseManager(getConfig());
-    PlayerService playerService = new PlayerService(databaseManager.getDataSource());
+    VipKeyService vipKeyService = new VipKeyService(databaseManager.getDataSource(),getConfig());
+    List<String> vips = new ArrayList<>();
 
     @Override
     public void onEnable() {
         getLogger().info("\033[92mBy: gabezk | Obrigado por usar!\033[0m");
         saveDefaultConfig(); // cria o arquivo de configuração padrão se ele não existir
         getCommand("celestialvip").setExecutor(this);
+        getCommand("gerarchavevip").setExecutor(this);
     }
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
+        if(vipKeyService.gerarChaveVip(sender,command,label,args)){
+            return true;
+        }
 
         if (command.getName()
                 .equalsIgnoreCase("celestialvip") && args
@@ -30,8 +39,9 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
                 saveDefaultConfig();
                 reloadConfig();
                 databaseManager.reload(getConfig());
-                playerService.reload(databaseManager.getDataSource());
+                vipKeyService = null;
                 System.gc();
+                vipKeyService = new VipKeyService(databaseManager.getDataSource(), getConfig());
             }catch (Exception e){
                 sender.sendMessage(e.getMessage());
             }

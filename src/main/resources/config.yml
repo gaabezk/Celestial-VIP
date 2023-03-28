@@ -27,7 +27,7 @@ config:
   #   %value% = quantidade de cash aparecerá no lugar.
   #   %tag% = tag do vip escolhida aparecerá no lugar.
   vips:
-    - group-name: 'diamond'
+    diamond:
       tag: '&bVIP DIAMOND'
       expires: true
       commands-after-expiration:
@@ -40,7 +40,7 @@ config:
         - '[console] give %player% netherite_boots 1'
         - '[console] eco give %player% 1000'
     #
-    - group-name: 'gold'
+    gold:
       tag: '&eVIP GOLD'
       expires: true
       commands-after-expiration:
@@ -53,7 +53,7 @@ config:
         - '[console] give %player% netherite_boots 1'
         - '[console] eco give %player% 500'
     #
-    - group-name: 'iron'
+    iron:
       tag: '&2VIP IRON'
       expires: true
       after-expiration-commands:

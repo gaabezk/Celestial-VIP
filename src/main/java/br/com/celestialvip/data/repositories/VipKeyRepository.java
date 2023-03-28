@@ -1,6 +1,8 @@
 package br.com.celestialvip.data.repositories;
 
+import br.com.celestialvip.data.DatabaseManager;
 import br.com.celestialvip.models.keys.VipKey;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,19 +21,28 @@ public class VipKeyRepository {
     private static final Logger logger = LoggerFactory.getLogger(VipKeyRepository.class);
 
     private final DataSource dataSource;
+    private final FileConfiguration config;
+    private final String prefix;
 
-    public VipKeyRepository(DataSource dataSource) {
+    public VipKeyRepository(DataSource dataSource, FileConfiguration config) {
         this.dataSource = dataSource;
+        this.config = config;
+        this.prefix = (String) config.get("config.database.tb_prefix");
     }
 
     public void saveVipKey(VipKey vipKey){
-        String sql = "INSERT INTO vip_key (key_code,used_by,vip_name,duration_in_days, is_active,is_permanent,creation_date) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO "+prefix+"vip_key (key_code,used_by,vip_name,duration_in_days, is_active,is_permanent,creation_date) VALUES (?, ?, ?, ?, ?,?,?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, vipKey.getKeyCode());
             statement.setString(2, vipKey.getUsedBy());
             statement.setString(3, vipKey.getVipName());
-            statement.setInt(4, vipKey.getDurationInDays());
+
+            if(vipKey.getDurationInDays()!=null) {
+                statement.setInt(4, vipKey.getDurationInDays());
+            }else{
+                statement.setNull(4, java.sql.Types.INTEGER);
+            }
             statement.setBoolean(5, vipKey.isActive());
             statement.setBoolean(6, vipKey.isPermanent());
             statement.setObject(7, Date.from(vipKey.getCreationDate().atStartOfDay(ZoneId.of("America/Sao_Paulo")).toInstant()));
@@ -43,7 +54,7 @@ public class VipKeyRepository {
 
     public List<VipKey> getAllVipKeys(boolean active){
         List<VipKey> cashKeys = new ArrayList<>();
-        String sql = "SELECT * FROM vip_key WHERE is_active = ?";
+        String sql = "SELECT * FROM "+prefix+"vip_key WHERE is_active = ?";
         try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setBoolean(1, active);
@@ -60,7 +71,7 @@ public class VipKeyRepository {
 
     public VipKey getCashKeyByKeyCode(String keyCode){
         VipKey vipKey = null;
-        String sql = "SELECT * FROM vip_key WHERE key_code = ? LIMIT 1";
+        String sql = "SELECT * FROM "+prefix+"vip_key WHERE key_code = ? LIMIT 1";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, keyCode);

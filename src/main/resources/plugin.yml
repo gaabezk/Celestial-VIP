@@ -8,4 +8,9 @@ commands:
     usage: /celestialvip reload
     permission: celestialvip.reload
     aliases: [cv, celestial-vip]
+  gerarchavevip:
+    description: Gera uma chave de ativação do vip escolhido
+    usage: /gerarchavevip <vip> <dias>
+    permission: celestialvip.adm
+    aliases: [generatevipkey]
 

@@ -107,7 +107,7 @@ public class DatabaseManager {
             try (Statement connection = getConnection().createStatement()) {
                 String playerData = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "player_data (nick VARCHAR(60) PRIMARY KEY, uuid VARCHAR(100) NOT NULL)";
                 String vip = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip (id SERIAL PRIMARY KEY, player_nick VARCHAR(60), `group` VARCHAR(60) NOT NULL, is_active BOOLEAN NOT NULL, vip_days INT NOT NULL, creation_date DATE NOT NULL, expiration_date DATE NOT NULL, FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
-                String vipKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip_key (key_code VARCHAR(255) PRIMARY KEY, vip_name VARCHAR(255) NOT NULL, duration_in_days INT NOT NULL, is_active BOOLEAN NOT NULL, is_permanent BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by VARCHAR(60))";
+                String vipKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip_key (key_code VARCHAR(255) PRIMARY KEY, vip_name VARCHAR(255) NOT NULL, duration_in_days INT, is_active BOOLEAN NOT NULL, is_permanent BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by VARCHAR(60))";
                 String cashKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "cash_key (key_code VARCHAR(255) PRIMARY KEY, quantity DOUBLE NOT NULL, is_active BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by VARCHAR(60))";
                 connection.executeUpdate(playerData);
                 connection.executeUpdate(vip);
