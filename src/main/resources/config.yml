@@ -3,9 +3,13 @@ config:
   prefix: '&6[CelestialVIP]'
   announce:
     active: true
-    # types: chat, actionbar, title, bossbar
+    # types: chat, actionbar, title
     type: 'chat'
-    message: '&a%player% &6acaba de ativar o %tag%.'
+    title:
+      title: '%player% se tornou um'
+      subtitle: '%tag%'
+    chat-and-actionbar:
+      message: '&a%player% se tornou um %tag%'
   key-size: 15
   database:
     # 'mysql' or 'postgresql'
@@ -17,22 +21,24 @@ config:
     password: 'password'
     tb_prefix: 'celestialvip_'
   mercadopago:
-    CLIENT_ID: CLIENT_ID
-    CLIENT_SECRET: CLIENT_SECRET
+    CLIENT_ID: 'CLIENT_ID'
+    CLIENT_SECRET: 'CLIENT_SECRET'
   #
   #   [console] = comando é executado pelo console.
   #   [player] = comando é executado pelo player.
   #   [message] = mensagem é enviada para o player.
   #   %player% = o nome do jogador aparecerá no lugar.
-  #   %value% = quantidade de cash aparecerá no lugar.
   #   %tag% = tag do vip escolhida aparecerá no lugar.
+  #   %group% = nome do grupo vip escolhido aparecerá no lugar.
+  #   %days% = quantidade de dias vip aparece no lugar.
+  #   %value% = quantidade de cash aparecerá no lugar.
   vips:
     diamond:
       tag: '&bVIP DIAMOND'
-      expires: true
       commands-after-expiration:
         - '[console] lp user %player% parent set default'
       activation-commands:
+        - '[console] lp user %player% parent set %group%'
         - '[console] give %player% netherite_sword 1'
         - '[console] give %player% netherite_helmet 1'
         - '[console] give %player% netherite_chestplate 1'
@@ -42,10 +48,10 @@ config:
     #
     gold:
       tag: '&eVIP GOLD'
-      expires: true
       commands-after-expiration:
         - '[console] lp user %player% parent set default'
       activation-commands:
+        - '[console] lp user %player% parent set %group%'
         - '[console] give %player% netherite_sword 1'
         - '[console] give %player% netherite_helmet 1'
         - '[console] give %player% netherite_chestplate 1'
@@ -55,10 +61,10 @@ config:
     #
     iron:
       tag: '&2VIP IRON'
-      expires: true
       after-expiration-commands:
         - '[console] lp user %player% parent set default '
       activation-commands:
+        - '[console] lp user %player% parent set %group%'
         - '[console] give %player% netherite_sword 1'
         - '[console] give %player% netherite_helmet 1'
         - '[console] give %player% netherite_chestplate 1'
