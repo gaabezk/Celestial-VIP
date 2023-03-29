@@ -13,4 +13,8 @@ commands:
     usage: /gerarchavevip <vip> <dias>
     permission: celestialvip.adm
     aliases: [generatevipkey]
+  resgatarvip:
+    description: resgata um vip com base no codigo mercado pago
+    usage: /resgatarvip <id da transação>
+    permission: celestialvip.adm
 
