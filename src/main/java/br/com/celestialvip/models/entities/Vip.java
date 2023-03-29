@@ -20,7 +20,7 @@ public class Vip {
     private LocalDate expirationDate;
     private static final ZoneId BRAZIL_TIMEZONE = ZoneId.of("America/Sao_Paulo");
 
-    public void definirDataDeExpiracao() {
+    public void definirDatas() {
         LocalDate dataAtual = LocalDate.now(BRAZIL_TIMEZONE);
         LocalDate dataExpiracao = dataAtual.plusDays(vipDays);
 

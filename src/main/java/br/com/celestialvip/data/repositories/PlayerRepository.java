@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import br.com.celestialvip.models.entities.PlayerData;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.eclipse.aether.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,15 +15,16 @@ import org.slf4j.LoggerFactory;
 public class PlayerRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(PlayerRepository.class);
-
+    private final String prefix;
     private final DataSource dataSource;
 
-    public PlayerRepository(DataSource dataSource) {
+    public PlayerRepository(DataSource dataSource, FileConfiguration config) {
+        this.prefix = (String) config.get("config.database.tb_prefix");
         this.dataSource = dataSource;
     }
 
     public void savePlayerData(PlayerData playerData) throws RepositoryException {
-        String sql = "INSERT INTO player_data (nick, uuid) VALUES (?, ?)";
+        String sql = "INSERT INTO "+prefix+"player_data (nick, uuid) VALUES (?, ?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, playerData.getNick());
@@ -36,7 +38,7 @@ public class PlayerRepository {
 
     public PlayerData getPlayerDataByNick(String nick) throws RepositoryException {
         PlayerData playerData = null;
-        String sql = "SELECT * FROM player_data WHERE nick = ? LIMIT 1";
+        String sql = "SELECT * FROM "+prefix+"player_data WHERE nick = ? LIMIT 1";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, nick);
@@ -55,7 +57,7 @@ public class PlayerRepository {
 
     public PlayerData getPlayerDataByUuid(String uuid) throws RepositoryException {
         PlayerData playerData = null;
-        String sql = "SELECT * FROM player_data WHERE uuid = ? LIMIT 1";
+        String sql = "SELECT * FROM "+prefix+"player_data WHERE uuid = ? LIMIT 1";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, uuid);

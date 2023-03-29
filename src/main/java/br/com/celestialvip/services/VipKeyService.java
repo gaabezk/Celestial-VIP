@@ -1,5 +1,6 @@
 package br.com.celestialvip.services;
 
+import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.data.repositories.VipKeyRepository;
 import br.com.celestialvip.models.keys.VipKey;
 import lombok.var;
@@ -7,6 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.eclipse.aether.RepositoryException;
 
 import javax.sql.DataSource;
@@ -21,6 +23,7 @@ import java.util.Set;
 
 import static java.rmi.server.RemoteServer.getLog;
 import static org.bukkit.Bukkit.getLogger;
+import static org.bukkit.Bukkit.getServer;
 
 public class VipKeyService {
 
@@ -51,7 +54,9 @@ public class VipKeyService {
     }
 
     public boolean gerarChaveVip(CommandSender sender, Command command, String label, String[] args) {
-        if (command.getName().equalsIgnoreCase("gerarchavevip") && args.length == 2) {
+        if (command.getName().equalsIgnoreCase("gerarchavevip") &&
+                args.length == 2) {
+
             List<String> vipsGroups = new ArrayList<>(vipKeys);
             Boolean isPerm = false;
             VipKey vipKey;
@@ -80,7 +85,6 @@ public class VipKeyService {
         }
         return false;
     }
-
 }
 //    ConfigurationSection vipSection = vips.getConfigurationSection(vipKey);
 //
