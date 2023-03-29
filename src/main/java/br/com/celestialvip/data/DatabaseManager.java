@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.Objects;
@@ -31,8 +30,8 @@ public class DatabaseManager {
     public DatabaseManager(FileConfiguration config) {
         if (
                 !((String) Objects.requireNonNull(config.get("config.database.type"))).equalsIgnoreCase("mysql") &&
-                !((String) Objects.requireNonNull(config.get("config.database.type"))).equalsIgnoreCase("postgresql") &&
-                !((String) Objects.requireNonNull(config.get("config.database.type"))).equalsIgnoreCase("BLANK_")) {
+                        !((String) Objects.requireNonNull(config.get("config.database.type"))).equalsIgnoreCase("postgresql") &&
+                        !((String) Objects.requireNonNull(config.get("config.database.type"))).equalsIgnoreCase("BLANK_")) {
             getLogger().warning("Banco de dados não suportado!!");
         }
 
@@ -74,7 +73,7 @@ public class DatabaseManager {
     }
 
     private void createDataSource(FileConfiguration config) {
-        if(!Objects.equals(config.get("config.database.type"), "BLANK_")){
+        if (!Objects.equals(config.get("config.database.type"), "BLANK_")) {
             String jdbcUrl = "jdbc:" +
                     (((String) config.get("config.database.type")).equalsIgnoreCase("mysql") ? "mysql" : "postgresql") +
                     "://" +
@@ -91,19 +90,19 @@ public class DatabaseManager {
                 hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-            }catch (Exception e){
-                getLogger().log(Level.SEVERE, "Erro ao configurar as propriedades de conexão: "+e.getMessage());
+            } catch (Exception e) {
+                getLogger().log(Level.SEVERE, "Erro ao configurar as propriedades de conexão: " + e.getMessage());
             }
             try {
                 this.dataSource = new HikariDataSource(hikariConfig);
-            }catch (RuntimeException e){
-                getLogger().log(Level.SEVERE, "Erro ao conectar ao banco: "+e.getMessage());
+            } catch (RuntimeException e) {
+                getLogger().log(Level.SEVERE, "Erro ao conectar ao banco: " + e.getMessage());
             }
         }
     }
 
     public void creteTables() {
-        if(dataSource!= null) {
+        if (dataSource != null) {
             try (Statement connection = getConnection().createStatement()) {
                 String playerData = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "player_data (nick VARCHAR(60) PRIMARY KEY, uuid VARCHAR(100) NOT NULL)";
                 String vip = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip (id SERIAL PRIMARY KEY, player_nick VARCHAR(60), `group` VARCHAR(60) NOT NULL, is_active BOOLEAN NOT NULL, vip_days INT NOT NULL, creation_date DATE NOT NULL, expiration_date DATE NOT NULL, FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";

@@ -1,6 +1,7 @@
 # Celestial VIP
 
-O Celestial VIP é um plugin para servidores de Minecraft que oferece recursos de VIP, incluindo a possibilidade de resgatar VIP ou Cash, gerar chaves de ativação e monitorar o tempo restante do VIP.
+O Celestial VIP é um plugin para servidores de Minecraft que oferece recursos de VIP, incluindo a possibilidade de
+resgatar VIP ou Cash, gerar chaves de ativação e monitorar o tempo restante do VIP.
 
 ## Recursos
 
@@ -38,23 +39,30 @@ O Celestial VIP é um plugin para servidores de Minecraft que oferece recursos d
 
 ## Configuração
 
-O plugin CelestialVIP oferece várias opções de configuração. É possível alterar a linguagem usada, definir um prefixo para as mensagens do plugin, escolher como as ativações dos vips são anunciadas, definir o tamanho das chaves usadas para ativar vips, escolher um tipo de banco de dados, e configurar os vips e a quantidade de cash que será dada ao jogador ao ativar um vip.
+O plugin CelestialVIP oferece várias opções de configuração. É possível alterar a linguagem usada, definir um prefixo
+para as mensagens do plugin, escolher como as ativações dos vips são anunciadas, definir o tamanho das chaves usadas
+para ativar vips, escolher um tipo de banco de dados, e configurar os vips e a quantidade de cash que será dada ao
+jogador ao ativar um vip.
 
 ### Opções disponíveis
 
-- `language`: define a linguagem usada pelo plugin. As opções disponíveis atualmente são pt-BR (português brasileiro) e en-US (inglês).
+- `language`: define a linguagem usada pelo plugin. As opções disponíveis atualmente são pt-BR (português brasileiro) e
+  en-US (inglês).
 - `prefix`: adiciona um prefixo às mensagens do plugin.
-- `announce`: configura como as ativações dos vips serão anunciadas. É possível escolher um ou mais tipos de anúncio, como chat, actionBar, título ou bossbar.
+- `announce`: configura como as ativações dos vips serão anunciadas. É possível escolher um ou mais tipos de anúncio,
+  como chat, actionBar, título ou bossbar.
 - `key-size`: define o tamanho das chaves usadas para ativar vips.
-- `database`: escolhe um tipo de banco de dados (mysql ou postgresql) e define as credenciais necessárias para acessá-lo.
+- `database`: escolhe um tipo de banco de dados (mysql ou postgresql) e define as credenciais necessárias para
+  acessá-lo.
 - `mercadopago`: configura as credenciais de acesso ao MercadoPago.
-- `vips`: define as características de cada vip, como o nome do grupo, a tag usada, se expira ou não, os comandos a serem executados após a expiração e os comandos a serem executados na ativação.
+- `vips`: define as características de cada vip, como o nome do grupo, a tag usada, se expira ou não, os comandos a
+  serem executados após a expiração e os comandos a serem executados na ativação.
 - `cash`: define os comandos a serem executados na ativação do cash.
-
 
 ## Contribuição
 
-Se você encontrar um bug ou quiser contribuir para o desenvolvimento deste plugin, sinta-se à vontade para enviar uma pull request ou abrir uma issue no repositório GitHub.
+Se você encontrar um bug ou quiser contribuir para o desenvolvimento deste plugin, sinta-se à vontade para enviar uma
+pull request ou abrir uma issue no repositório GitHub.
 
 ## Licença
 

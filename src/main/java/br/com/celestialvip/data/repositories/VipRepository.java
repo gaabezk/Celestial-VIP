@@ -1,7 +1,6 @@
 package br.com.celestialvip.data.repositories;
 
 import br.com.celestialvip.models.entities.Vip;
-import br.com.celestialvip.models.keys.VipKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -31,7 +29,7 @@ public class VipRepository {
     }
 
     public void saveVip(Vip vip) {
-        String sql = "INSERT INTO "+prefix+"vip (player_nick, `group`, is_active, vip_days, creation_date, expiration_date) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO " + prefix + "vip (player_nick, `group`, is_active, vip_days, creation_date, expiration_date) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, vip.getPlayerNick());
@@ -48,7 +46,7 @@ public class VipRepository {
 
     public List<Vip> getAllVipsByPlayerNick(String playerNick, boolean active) {
         List<Vip> vips = new ArrayList<>();
-        String sql = "SELECT * FROM "+prefix+"vip WHERE player_nick = ? AND is_active = ?";
+        String sql = "SELECT * FROM " + prefix + "vip WHERE player_nick = ? AND is_active = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, playerNick);
@@ -66,7 +64,7 @@ public class VipRepository {
 
     public List<Vip> getAllVipsByGroup(String group, boolean active) {
         List<Vip> vips = new ArrayList<>();
-        String sql = "SELECT * FROM "+prefix+"vip WHERE `group` = ? AND is_active = ?";
+        String sql = "SELECT * FROM " + prefix + "vip WHERE `group` = ? AND is_active = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, group);
@@ -84,7 +82,7 @@ public class VipRepository {
 
     public List<Vip> getAllVipsByDays(int days, boolean active) {
         List<Vip> vips = new ArrayList<>();
-        String sql = "SELECT * FROM "+prefix+"vip WHERE vip_days = ? AND is_active = ?";
+        String sql = "SELECT * FROM " + prefix + "vip WHERE vip_days = ? AND is_active = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, days);
@@ -99,8 +97,9 @@ public class VipRepository {
         }
         return vips;
     }
+
     public void saveMercadoPagoVipKey(String mercadoPagoVipKey) {
-        String sql = "INSERT INTO "+prefix+"mercado_pago_vip_codes (key_code,creation_date) VALUES (?, ?)";
+        String sql = "INSERT INTO " + prefix + "mercado_pago_vip_codes (key_code,creation_date) VALUES (?, ?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, mercadoPagoVipKey);
@@ -110,9 +109,10 @@ public class VipRepository {
             logger.error("Error while saving Mercado Pago VipKey to database", e);
         }
     }
-    public String getMercadoPagoVipKey(String keyCode){
+
+    public String getMercadoPagoVipKey(String keyCode) {
         String code = null;
-        String sql = "SELECT * FROM "+prefix+"mercado_pago_vip_codes WHERE key_code = ? LIMIT 1";
+        String sql = "SELECT * FROM " + prefix + "mercado_pago_vip_codes WHERE key_code = ? LIMIT 1";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, keyCode);

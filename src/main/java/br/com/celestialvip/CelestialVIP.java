@@ -16,8 +16,8 @@ import java.util.List;
 
 public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
     DatabaseManager databaseManager = new DatabaseManager(getConfig());
-    VipKeyService vipKeyService = new VipKeyService(databaseManager.getDataSource(),getConfig());
-    ActivationService activationService = new ActivationService(databaseManager.getDataSource(),getConfig());
+    VipKeyService vipKeyService = new VipKeyService(databaseManager.getDataSource(), getConfig());
+    ActivationService activationService = new ActivationService(databaseManager.getDataSource(), getConfig());
     List<String> vips = new ArrayList<>();
 
     @Override
@@ -28,14 +28,15 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
         getCommand("gerarchavevip").setExecutor(this);
         getCommand("resgatarvip").setExecutor(this);
     }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if(vipKeyService.gerarChaveVip(sender,command,label,args)){
+        if (vipKeyService.gerarChaveVip(sender, command, label, args)) {
             return true;
         }
         try {
-            if(activationService.resgatarVip(sender,command,label,args)){
+            if (activationService.resgatarVip(sender, command, label, args)) {
                 return true;
             }
         } catch (IOException e) {
@@ -56,7 +57,7 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
                 System.gc();
                 activationService = new ActivationService(databaseManager.getDataSource(), getConfig());
                 vipKeyService = new VipKeyService(databaseManager.getDataSource(), getConfig());
-            }catch (Exception e){
+            } catch (Exception e) {
                 sender.sendMessage(e.getMessage());
             }
             sender.sendMessage("Configurações recarregadas com sucesso!");
@@ -64,6 +65,7 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
         }
         return false;
     }
+
     @Override
     public void onDisable() {
         getLogger().info("\033[91mPlugin desativado!\033[0m");

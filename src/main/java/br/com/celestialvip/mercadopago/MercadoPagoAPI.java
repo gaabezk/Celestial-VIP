@@ -1,6 +1,5 @@
 package br.com.celestialvip.mercadopago;
 
-import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.entities.PayamentStatus;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -41,9 +40,9 @@ public class MercadoPagoAPI {
                 JsonObject result = jsonObject.get("results").getAsJsonArray().get(0).getAsJsonObject();
                 String status = result.get("status").getAsString();
                 String externalReference = result.get("external_reference").getAsString();
-                return new PayamentStatus(paymentId,status,externalReference);
+                return new PayamentStatus(paymentId, status, externalReference);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return new PayamentStatus();
         }
         return new PayamentStatus();

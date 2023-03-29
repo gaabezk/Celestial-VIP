@@ -1,16 +1,16 @@
 package br.com.celestialvip.data.repositories;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import javax.sql.DataSource;
-
 import br.com.celestialvip.models.entities.PlayerData;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.eclipse.aether.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class PlayerRepository {
 
@@ -24,7 +24,7 @@ public class PlayerRepository {
     }
 
     public void savePlayerData(PlayerData playerData) throws RepositoryException {
-        String sql = "INSERT INTO "+prefix+"player_data (nick, uuid) VALUES (?, ?)";
+        String sql = "INSERT INTO " + prefix + "player_data (nick, uuid) VALUES (?, ?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, playerData.getNick());
@@ -38,7 +38,7 @@ public class PlayerRepository {
 
     public PlayerData getPlayerDataByNick(String nick) throws RepositoryException {
         PlayerData playerData = null;
-        String sql = "SELECT * FROM "+prefix+"player_data WHERE nick = ? LIMIT 1";
+        String sql = "SELECT * FROM " + prefix + "player_data WHERE nick = ? LIMIT 1";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, nick);
@@ -57,7 +57,7 @@ public class PlayerRepository {
 
     public PlayerData getPlayerDataByUuid(String uuid) throws RepositoryException {
         PlayerData playerData = null;
-        String sql = "SELECT * FROM "+prefix+"player_data WHERE uuid = ? LIMIT 1";
+        String sql = "SELECT * FROM " + prefix + "player_data WHERE uuid = ? LIMIT 1";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, uuid);

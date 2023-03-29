@@ -11,6 +11,7 @@ import java.time.ZoneId;
 @AllArgsConstructor
 @ToString
 public class Vip {
+    private static final ZoneId BRAZIL_TIMEZONE = ZoneId.of("America/Sao_Paulo");
     private Integer id;
     private String playerNick;
     private String group;
@@ -18,7 +19,6 @@ public class Vip {
     private int vipDays;
     private LocalDate creationDate;
     private LocalDate expirationDate;
-    private static final ZoneId BRAZIL_TIMEZONE = ZoneId.of("America/Sao_Paulo");
 
     public void definirDatas() {
         LocalDate dataAtual = LocalDate.now(BRAZIL_TIMEZONE);
@@ -27,6 +27,7 @@ public class Vip {
         this.creationDate = dataAtual;
         this.expirationDate = dataExpiracao;
     }
+
     public boolean isVipExpired() {
         LocalDate today = LocalDate.now(BRAZIL_TIMEZONE);
         return today.isAfter(expirationDate);
