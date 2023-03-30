@@ -7,6 +7,7 @@ import br.com.celestialvip.mercadopago.MercadoPagoAPI;
 import br.com.celestialvip.models.entities.PayamentStatus;
 import br.com.celestialvip.models.entities.PlayerData;
 import br.com.celestialvip.models.entities.Vip;
+import br.com.celestialvip.utils.Utilities;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -115,7 +116,7 @@ public class ActivationService {
             List<String> activationCommands = vipSection.getStringList("activation-commands"); // obtém a lista de comandos de ativação para o tipo de VIP escolhido
 
             if (config.getBoolean("config.announce.active")) {
-                String message = ColorUtils.translateColorCodes(config.getString("config.prefix") + " " + replaceVariables(config.getString("config.announce.chat-and-actionbar.message"), player, days, vipType, vipSection));
+                String message = Utilities.translateColorCodes(config.getString("config.prefix") + " " + replaceVariables(config.getString("config.announce.chat-and-actionbar.message"), player, days, vipType, vipSection));
                 String announceType = config.getString("config.announce.type");
 
                 switch (announceType) {
@@ -146,7 +147,7 @@ public class ActivationService {
 
             for (String command : activationCommands) {
                 command = command.replace("%player%", player.getName()); // substitui %player% pelo nome do jogador
-                command = command.replace("%tag%", ColorUtils.translateColorCodes(vipSection.getString("tag"))); // substitui %tag% pela tag do VIP escolhido
+                command = command.replace("%tag%", Utilities.translateColorCodes(vipSection.getString("tag"))); // substitui %tag% pela tag do VIP escolhido
                 command = command.replace("%days%", days);
                 command = command.replace("%group%", vipType);
 

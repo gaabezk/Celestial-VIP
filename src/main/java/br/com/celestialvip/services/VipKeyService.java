@@ -2,6 +2,7 @@ package br.com.celestialvip.services;
 
 import br.com.celestialvip.data.repositories.VipKeyRepository;
 import br.com.celestialvip.models.keys.VipKey;
+import br.com.celestialvip.utils.Utilities;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -34,17 +35,6 @@ public class VipKeyService {
         }
     }
 
-    public String generateSecureRandomString(int length) {
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder sb = new StringBuilder(length);
-        SecureRandom random = new SecureRandom();
-        for (int i = 0; i < length; i++) {
-            int index = random.nextInt(characters.length());
-            sb.append(characters.charAt(index));
-        }
-        return sb.toString();
-    }
-
     public boolean gerarChaveVip(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("gerarchavevip") &&
                 args.length == 2) {
@@ -58,7 +48,7 @@ public class VipKeyService {
                 }
                 try {
                     vipKey = new VipKey(
-                            generateSecureRandomString((int) config.get("config.key-size")),
+                            Utilities.generateSecureRandomString((int) config.get("config.key-size")),
                             null,
                             args[0],
                             isPerm ? null : Integer.parseInt(args[1]),

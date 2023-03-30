@@ -35,13 +35,12 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
         if (vipKeyService.gerarChaveVip(sender, command, label, args)) {
             return true;
         }
+
         try {
             if (activationService.resgatarVip(sender, command, label, args)) {
                 return true;
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (RepositoryException e) {
+        } catch (IOException | RepositoryException e) {
             throw new RuntimeException(e);
         }
 
@@ -53,10 +52,9 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
                 saveDefaultConfig();
                 reloadConfig();
                 databaseManager.reload(getConfig());
-                vipKeyService = null;
-                System.gc();
                 activationService = new ActivationService(databaseManager.getDataSource(), getConfig());
                 vipKeyService = new VipKeyService(databaseManager.getDataSource(), getConfig());
+                System.gc();
             } catch (Exception e) {
                 sender.sendMessage(e.getMessage());
             }

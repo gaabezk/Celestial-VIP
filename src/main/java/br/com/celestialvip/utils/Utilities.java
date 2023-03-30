@@ -1,13 +1,10 @@
-package br.com.celestialvip.services;
+package br.com.celestialvip.utils;
 
-public class ColorUtils {
+import java.security.SecureRandom;
+
+public class Utilities {
 
     static public final String WITH_DELIMITER = "((?<=%1$s)|(?=%1$s))";
-
-    /**
-     * @param text The string of text to apply color/effects to
-     * @return Returns a string of text with color/effects applied
-     */
     public static String translateColorCodes(String text) {
 
         String[] texts = text.split(String.format(WITH_DELIMITER, "&"));
@@ -30,4 +27,16 @@ public class ColorUtils {
 
         return finalText.toString();
     }
+
+    public static String generateSecureRandomString(int length) {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder(length);
+        SecureRandom random = new SecureRandom();
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(characters.length());
+            sb.append(characters.charAt(index));
+        }
+        return sb.toString();
+    }
+
 }
