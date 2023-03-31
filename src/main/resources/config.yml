@@ -12,8 +12,8 @@ config:
       message: '&a%player% se tornou um %tag%'
   key-size: 15
   database:
-    # 'mysql' or 'postgresql'
-    type: 'BLANK_'
+    # 'mysql' , 'postgresql' or 'sqlite'
+    drive: 'sqlite'
     host: 'localhost'
     port: '3306'
     database: 'teste'
