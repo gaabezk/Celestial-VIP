@@ -1,6 +1,6 @@
 package br.com.celestialvip.services;
 
-import br.com.celestialvip.data.repositories.VipKeyRepository;
+import br.com.celestialvip.data.repositories.VipRepository;
 import br.com.celestialvip.models.keys.VipKey;
 import br.com.celestialvip.utils.Utilities;
 import org.bukkit.command.Command;
@@ -9,7 +9,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import javax.sql.DataSource;
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +18,13 @@ import static org.bukkit.Bukkit.getLogger;
 
 public class VipKeyService {
 
-    VipKeyRepository vipKeyRepository;
+    VipRepository vipKeyRepository;
     ConfigurationSection vips;
     FileConfiguration config;
     Set<String> vipKeys;
 
     public VipKeyService(DataSource dataSource, FileConfiguration config) {
-        this.vipKeyRepository = new VipKeyRepository(dataSource, config);
+        this.vipKeyRepository = new VipRepository(dataSource, config);
 
         this.vips = config.getConfigurationSection("config.vips");
         this.config = config;

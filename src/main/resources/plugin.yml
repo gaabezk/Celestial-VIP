@@ -4,17 +4,21 @@ main: br.com.celestialvip.CelestialVIP
 api-version: 1.19
 commands:
   celestialvip:
-    description: Recarrega o CelestialVIP
+    description: Recarrega o CelestialVIP.
     usage: /celestialvip reload
     permission: celestialvip.reload
     aliases: [ cv, celestial-vip ]
   gerarchavevip:
-    description: Gera uma chave de ativação do vip escolhido
-    usage: /gerarchavevip <vip> <dias>
+    description: Gera uma chave de ativação do vip escolhido.
+    usage: /gerarchavevip <vip> <dias>.
     permission: celestialvip.adm
     aliases: [ generatevipkey ]
   resgatarvip:
-    description: resgata um vip com base no codigo mercado pago
+    description: resgata seu vip usando o codigo da compra.
     usage: /resgatarvip <id da transação>
-    permission: celestialvip.adm
+    aliases: [ redeemvip ]
+  resgatarcash:
+    description: resgata seu cash usando o codigo da compra.
+    usage: /resgatarcash <id da transação>.
+    aliases: [ redeemcash ]
 
