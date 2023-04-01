@@ -44,7 +44,7 @@ public class ActivationService {
 
     public boolean redeemCash(CommandSender sender, Command cmd, String label, String[] args) throws IOException, RepositoryException {
 
-        if(cmd.getName().equalsIgnoreCase("resgatarcash")&& args.length == 1){
+        if (cmd.getName().equalsIgnoreCase("resgatarcash") && args.length == 1) {
 
             if (!(sender instanceof Player)) {
                 sender.sendMessage("Este comando só pode ser executado por um jogador.");
@@ -73,7 +73,7 @@ public class ActivationService {
                     .filter(s -> !s.isEmpty())
                     .toArray(String[]::new);
 
-            if(partes.length!=1){
+            if (partes.length != 1) {
                 player.sendMessage("Essa não é uma chave de cash, por favor tente /resgatarvip <codigo>");
                 return true;
             }
@@ -83,8 +83,8 @@ public class ActivationService {
                 return true;
             }
 
-            activateCash(player,partes[0]);
-            cashRepository.saveMercadoPagoCashCode(args[0],player.getName());
+            activateCash(player, partes[0]);
+            cashRepository.saveMercadoPagoCashCode(args[0], player.getName());
 
             return true;
         }
@@ -126,7 +126,7 @@ public class ActivationService {
                     .filter(s -> !s.isEmpty())
                     .toArray(String[]::new);
 
-            if(partes.length!=2){
+            if (partes.length != 2) {
                 player.sendMessage("Essa não é uma chave vip, por favor tente /resgatarcash <codigo>");
                 return true;
             }
@@ -143,7 +143,7 @@ public class ActivationService {
             }
 
             activateVip(player, partes[0], partes[1]);
-            vipRepository.saveMercadoPagoVipKey(args[0],player.getName());
+            vipRepository.saveMercadoPagoVipKey(args[0], player.getName());
 
             return true;
         }
@@ -153,7 +153,7 @@ public class ActivationService {
     private void activateCash(Player player, String value) throws RepositoryException {
         ConfigurationSection cashSection = config.getConfigurationSection("config.cash");
 
-        if(cashSection != null){
+        if (cashSection != null) {
 
             PlayerData playerData = playerRepository.getPlayerDataByNick(player.getName());
             if (playerData == null) {
@@ -247,6 +247,7 @@ public class ActivationService {
 
         return message;
     }
+
     private String replaceCashVariables(String message, Player player, String value) {
         message = message.replace("%player%", player.getName());
         message = message.replace("%value%", value);

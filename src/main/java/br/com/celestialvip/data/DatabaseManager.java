@@ -56,7 +56,7 @@ public class DatabaseManager {
 
         try {
 
-            switch(Objects.requireNonNull(drive).toLowerCase()) {
+            switch (Objects.requireNonNull(drive).toLowerCase()) {
                 case "mysql":
                     hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
                     hikariConfig.setJdbcUrl(String.format("jdbc:%s://%s:%s/%s", drive, host, port, database));
@@ -106,7 +106,7 @@ public class DatabaseManager {
                 String mercadoPagoVipKey;
                 String mercadoPagoCashKey;
 
-                switch(Objects.requireNonNull(drive).toLowerCase()) {
+                switch (Objects.requireNonNull(drive).toLowerCase()) {
 
                     case "mysql":
                         playerData = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "player_data (nick VARCHAR(60) PRIMARY KEY, uuid VARCHAR(100) NOT NULL)";

@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 public class Utilities {
 
     static public final String WITH_DELIMITER = "((?<=%1$s)|(?=%1$s))";
+
     public static String translateColorCodes(String text) {
 
         String[] texts = text.split(String.format(WITH_DELIMITER, "&"));

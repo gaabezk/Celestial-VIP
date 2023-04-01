@@ -26,6 +26,7 @@ public class CashRepository {
         this.dataSource = dataSource;
         this.prefix = (String) config.get("config.database.tb_prefix");
     }
+
     public void saveMercadoPagoCashCode(String mercadoPagoCashKey, String playerNick) {
         String sql = "INSERT INTO " + prefix + "mercado_pago_cash_codes (key_code,creation_date,player_nick) VALUES (?, ?, ?)";
         try (Connection connection = dataSource.getConnection();

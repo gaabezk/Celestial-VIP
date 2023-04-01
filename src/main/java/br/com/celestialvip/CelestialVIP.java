@@ -17,7 +17,7 @@ import java.util.Timer;
 
 
 public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
-    DatabaseManager databaseManager = new DatabaseManager(getConfig(),getDataFolder());
+    DatabaseManager databaseManager = new DatabaseManager(getConfig(), getDataFolder());
     VipKeyService vipKeyService = new VipKeyService(databaseManager.getDataSource(), getConfig());
     ActivationService activationService = new ActivationService(databaseManager.getDataSource(), getConfig());
     List<String> vips = new ArrayList<>();
@@ -36,17 +36,17 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
     public void checkVipExpiration() {
         int vipExpirationCheckInterval = getConfig().getInt("config.vip-expiration-check-interval");
         Timer timer = new Timer();
-        timer.schedule(new DeactivationService(databaseManager.getDataSource(),getConfig()), 0, vipExpirationCheckInterval * 1000);
+        timer.schedule(new DeactivationService(databaseManager.getDataSource(), getConfig()), 0, vipExpirationCheckInterval * 1000);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        try{
+        try {
             if (vipKeyService.gerarChaveVip(sender, command, label, args)) {
                 return true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -59,8 +59,8 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
             throw new RuntimeException(e);
         }
 
-        try{
-            if (activationService.redeemCash(sender,command,label,args)){
+        try {
+            if (activationService.redeemCash(sender, command, label, args)) {
                 return true;
             }
         } catch (IOException | RepositoryException e) {
@@ -74,7 +74,7 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
             try {
                 saveDefaultConfig();
                 reloadConfig();
-                databaseManager = new DatabaseManager(getConfig(),getDataFolder());
+                databaseManager = new DatabaseManager(getConfig(), getDataFolder());
                 activationService = new ActivationService(databaseManager.getDataSource(), getConfig());
                 vipKeyService = new VipKeyService(databaseManager.getDataSource(), getConfig());
                 System.gc();

@@ -32,23 +32,24 @@ public class DeactivationService extends TimerTask {
         }
         return false;
     }
+
     @Override
     public void run() {
         getLogger().info("§aBuscando vips expirados...");
         int expireds = 0;
         List<Vip> vips = vipRepository.getAllVips(true);
-        for (Vip vip : vips){
-            if(vipExpired(vip.getExpirationDate())){
+        for (Vip vip : vips) {
+            if (vipExpired(vip.getExpirationDate())) {
                 expireds++;
-                ConfigurationSection vipSection = config.getConfigurationSection("config.vips."+vip.getGroup());
-                if(vipSection != null){
+                ConfigurationSection vipSection = config.getConfigurationSection("config.vips." + vip.getGroup());
+                if (vipSection != null) {
                     vip.setActive(false);
                     vipRepository.updateVip(vip);
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(vip.getPlayerNick());
                     List<String> activationCommands = vipSection.getStringList("after-expiration-commands");
 
                     for (String command : activationCommands) {
-                        command = replaceVipVariables(command,offlinePlayer.getName(),""+vip.getVipDays(),vip.getGroup(),vipSection);
+                        command = replaceVipVariables(command, offlinePlayer.getName(), "" + vip.getVipDays(), vip.getGroup(), vipSection);
                         if (command.startsWith("[console] ")) {
                             command = command.replace("&", "§");
                             String finalCommand = command;
@@ -57,11 +58,11 @@ public class DeactivationService extends TimerTask {
                             });
 
                         } else if (command.startsWith("[player] ")) {
-                            if(offlinePlayer.isOnline()){
+                            if (offlinePlayer.isOnline()) {
                                 Bukkit.getPlayer(offlinePlayer.getName()).performCommand(command.substring(9));
                             }
                         } else if (command.startsWith("[message] ")) {
-                            if(offlinePlayer.isOnline()){
+                            if (offlinePlayer.isOnline()) {
                                 command = command.replace("&", "§");
                                 Bukkit.getPlayer(offlinePlayer.getName()).sendMessage(command.substring(10));
                             }
@@ -70,7 +71,7 @@ public class DeactivationService extends TimerTask {
                 }
             }
         }
-        getLogger().info("§aForam encontrados §e"+expireds+" vips expirados.");
+        getLogger().info("§aForam encontrados §e" + expireds + " vips expirados.");
     }
 
     private String replaceVipVariables(String message, String playerNick, String days, String vipType, ConfigurationSection vipSection) {

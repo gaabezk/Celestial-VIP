@@ -43,6 +43,7 @@ public class VipRepository {
             logger.error("Error while saving vip to database", e);
         }
     }
+
     public void updateVip(Vip vip) {
         String sql = "UPDATE " + prefix + "vip SET player_nick=?, vip_group=?, is_active=?, vip_days=?, creation_date=?, expiration_date=? WHERE id=?";
         try (Connection connection = dataSource.getConnection();
@@ -76,6 +77,7 @@ public class VipRepository {
         }
         return vips;
     }
+
     public List<Vip> getAllVipsByPlayerNick(String playerNick, boolean active) {
         List<Vip> vips = new ArrayList<>();
         String sql = "SELECT * FROM " + prefix + "vip WHERE player_nick = ? AND is_active = ?";
