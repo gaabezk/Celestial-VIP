@@ -7,10 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -26,26 +24,58 @@ public class VipRepository {
 
     public VipRepository(DataSource dataSource, FileConfiguration config) {
         this.dataSource = dataSource;
-        this.prefix = (String) config.get("config.database.tb_prefix");
+        this.prefix = config.getString("config.database.tb_prefix");
         this.config = config;
     }
 
     public void saveVip(Vip vip) {
-        String sql = "INSERT INTO " + prefix + "vip (player_nick, `group`, is_active, vip_days, creation_date, expiration_date) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO " + prefix + "vip (player_nick, vip_group, is_active, vip_days, creation_date, expiration_date) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, vip.getPlayerNick());
             statement.setString(2, vip.getGroup());
             statement.setBoolean(3, vip.isActive());
             statement.setInt(4, vip.getVipDays());
-            statement.setObject(5, Date.from(vip.getCreationDate().atStartOfDay(ZoneId.of("America/Sao_Paulo")).toInstant()));
-            statement.setObject(6, Date.from(vip.getExpirationDate().atStartOfDay(ZoneId.of("America/Sao_Paulo")).toInstant()));
+            statement.setDate(5, java.sql.Date.valueOf(vip.getCreationDate()));
+            statement.setDate(6, java.sql.Date.valueOf(vip.getExpirationDate()));
             statement.executeUpdate();
         } catch (SQLException e) {
             logger.error("Error while saving vip to database", e);
         }
     }
+    public void updateVip(Vip vip) {
+        String sql = "UPDATE " + prefix + "vip SET player_nick=?, vip_group=?, is_active=?, vip_days=?, creation_date=?, expiration_date=? WHERE id=?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, vip.getPlayerNick());
+            statement.setString(2, vip.getGroup());
+            statement.setBoolean(3, vip.isActive());
+            statement.setInt(4, vip.getVipDays());
+            statement.setDate(5, java.sql.Date.valueOf(vip.getCreationDate()));
+            statement.setDate(6, java.sql.Date.valueOf(vip.getExpirationDate()));
+            statement.setInt(7, vip.getId());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error while updating vip in database", e);
+        }
+    }
 
+    public List<Vip> getAllVips(boolean active) {
+        List<Vip> vips = new ArrayList<>();
+        String sql = "SELECT * FROM " + prefix + "vip WHERE is_active = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setBoolean(1, active);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    vips.add(returnVip(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Error while getting vips by player nick from database", e);
+        }
+        return vips;
+    }
     public List<Vip> getAllVipsByPlayerNick(String playerNick, boolean active) {
         List<Vip> vips = new ArrayList<>();
         String sql = "SELECT * FROM " + prefix + "vip WHERE player_nick = ? AND is_active = ?";
@@ -66,7 +96,7 @@ public class VipRepository {
 
     public List<Vip> getAllVipsByGroup(String group, boolean active) {
         List<Vip> vips = new ArrayList<>();
-        String sql = "SELECT * FROM " + prefix + "vip WHERE `group` = ? AND is_active = ?";
+        String sql = "SELECT * FROM " + prefix + "vip WHERE vip_group = ? AND is_active = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, group);
@@ -202,7 +232,7 @@ public class VipRepository {
         return new Vip(
                 resultSet.getInt("id"),
                 resultSet.getString("player_nick"),
-                resultSet.getString("group"),
+                resultSet.getString("vip_group"),
                 resultSet.getBoolean("is_active"),
                 resultSet.getInt("vip_days"),
                 resultSet.getDate("creation_date").toLocalDate(),

@@ -74,6 +74,7 @@ public class MercadoPagoAPI {
                 JsonObject jsonObject = new Gson().fromJson(responseBody, JsonObject.class);
                 return jsonObject.get("access_token").getAsString();
             } else {
+                response.close();
                 return null;
             }
         } catch (IOException e) {
@@ -81,6 +82,7 @@ public class MercadoPagoAPI {
             return null;
         }
     }
+
 }
 
 
