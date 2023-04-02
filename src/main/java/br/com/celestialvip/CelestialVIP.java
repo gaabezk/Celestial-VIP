@@ -2,6 +2,7 @@ package br.com.celestialvip;
 
 import br.com.celestialvip.data.DatabaseManager;
 import br.com.celestialvip.services.ActivationService;
+import br.com.celestialvip.services.DeactivationService;
 import br.com.celestialvip.services.VipKeyService;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,6 +13,7 @@ import org.eclipse.aether.RepositoryException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 
 public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
@@ -28,6 +30,13 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
         getCommand("gerarchavevip").setExecutor(this);
         getCommand("resgatarvip").setExecutor(this);
         getCommand("resgatarcash").setExecutor(this);
+        checkVipExpiration();
+    }
+
+    public void checkVipExpiration() {
+        int vipExpirationCheckInterval = getConfig().getInt("config.vip-expiration-check-interval");
+        Timer timer = new Timer();
+        timer.schedule(new DeactivationService(databaseManager.getDataSource(),getConfig()), 0, vipExpirationCheckInterval * 1000);
     }
 
     @Override

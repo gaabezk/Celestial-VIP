@@ -1,5 +1,7 @@
 config:
   language: 'pt-BR'
+  # in seconds - default = 1800 (30min)
+  vip-expiration-check-interval: 1800
   prefix: '&6[CelestialVIP]'
   announce:
     active: true
@@ -35,7 +37,7 @@ config:
   vips:
     diamond:
       tag: '&bVIP DIAMOND'
-      commands-after-expiration:
+      after-expiration-commands:
         - '[console] lp user %player% parent set default'
       activation-commands:
         - '[console] lp user %player% parent set %group%'
@@ -48,7 +50,7 @@ config:
     #
     gold:
       tag: '&eVIP GOLD'
-      commands-after-expiration:
+      after-expiration-commands:
         - '[console] lp user %player% parent set default'
       activation-commands:
         - '[console] lp user %player% parent set %group%'
