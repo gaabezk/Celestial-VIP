@@ -32,7 +32,6 @@ public class GenerateKeyCommand implements CommandExecutor {
             }else if(args[0].equalsIgnoreCase("cash") && args.length == 2){
                 return cash(sender,args);
             }
-
         }
         return false;
     }

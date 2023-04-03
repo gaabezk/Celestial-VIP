@@ -78,8 +78,8 @@ public class ActivationService {
                         }
                         break;
                     case "title":
-                        String title = replaceVipVariables(config.getString("config.announce.title.title"), player, days, vipType, vipSection);
-                        String subTitle = replaceVipVariables(config.getString("config.announce.title.subtitle"), player, days, vipType, vipSection);
+                        String title = Utilities.translateColorCodes(replaceVipVariables(config.getString("config.announce.title.title"), player, days, vipType, vipSection));
+                        String subTitle = Utilities.translateColorCodes(replaceVipVariables(config.getString("config.announce.title.subtitle"), player, days, vipType, vipSection));
                         for (Player p : Bukkit.getServer().getOnlinePlayers()) {
                             p.sendTitle(title, subTitle);
                         }
