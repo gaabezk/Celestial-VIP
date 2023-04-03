@@ -1,43 +1,39 @@
 package br.com.celestialvip.data.repositories;
 
+import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.entities.Vip;
 import br.com.celestialvip.models.keys.VipKey;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class VipRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(VipRepository.class);
-    private final DataSource dataSource;
-    private final String prefix;
-    private final FileConfiguration config;
-
-    public VipRepository(DataSource dataSource, FileConfiguration config) {
-        this.dataSource = dataSource;
-        this.prefix = config.getString("config.database.tb_prefix");
-        this.config = config;
-    }
+    private final DataSource dataSource = CelestialVIP.getDatabaseManager().getDataSource();
+    private final String prefix = CelestialVIP.getPlugin().getConfig().getString("config.database.tb_prefix");
 
     public void saveVip(Vip vip) {
-        String sql = "INSERT INTO " + prefix + "vip (player_nick, vip_group, is_active, vip_days, creation_date, expiration_date) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO " + prefix + "vip (player_nick, vip_group, is_active, vip_days, is_permanent, creation_date, expiration_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, vip.getPlayerNick());
             statement.setString(2, vip.getGroup());
             statement.setBoolean(3, vip.isActive());
             statement.setInt(4, vip.getVipDays());
-            statement.setDate(5, java.sql.Date.valueOf(vip.getCreationDate()));
-            statement.setDate(6, java.sql.Date.valueOf(vip.getExpirationDate()));
+            statement.setBoolean(5, vip.isPermanent());
+            statement.setDate(6, java.sql.Date.valueOf(vip.getCreationDate()));
+            if (vip.getExpirationDate() != null) {
+                statement.setDate(7, java.sql.Date.valueOf(vip.getExpirationDate()));
+            } else {
+                statement.setNull(7, java.sql.Types.DATE);
+            }
+
             statement.executeUpdate();
         } catch (SQLException e) {
             logger.error("Error while saving vip to database", e);
@@ -45,28 +41,30 @@ public class VipRepository {
     }
 
     public void updateVip(Vip vip) {
-        String sql = "UPDATE " + prefix + "vip SET player_nick=?, vip_group=?, is_active=?, vip_days=?, creation_date=?, expiration_date=? WHERE id=?";
+        String sql = "UPDATE " + prefix + "vip SET player_nick=?, vip_group=?, is_active=?, vip_days=?, is_permanent=?, creation_date=?, expiration_date=? WHERE id=?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, vip.getPlayerNick());
             statement.setString(2, vip.getGroup());
             statement.setBoolean(3, vip.isActive());
             statement.setInt(4, vip.getVipDays());
-            statement.setDate(5, java.sql.Date.valueOf(vip.getCreationDate()));
-            statement.setDate(6, java.sql.Date.valueOf(vip.getExpirationDate()));
-            statement.setInt(7, vip.getId());
+            statement.setBoolean(5, vip.isPermanent());
+            statement.setDate(6, java.sql.Date.valueOf(vip.getCreationDate()));
+            statement.setDate(7, java.sql.Date.valueOf(vip.getExpirationDate()));
+            statement.setInt(8, vip.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             logger.error("Error while updating vip in database", e);
         }
     }
 
-    public List<Vip> getAllVips(boolean active) {
+    public List<Vip> getAllVips(boolean active,boolean permanent) {
         List<Vip> vips = new ArrayList<>();
-        String sql = "SELECT * FROM " + prefix + "vip WHERE is_active = ?";
+        String sql = "SELECT * FROM " + prefix + "vip WHERE is_active = ? AND is_permanent = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setBoolean(1, active);
+            statement.setBoolean(2, permanent);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     vips.add(returnVip(resultSet));
@@ -169,18 +167,29 @@ public class VipRepository {
             statement.setString(1, vipKey.getKeyCode());
             statement.setString(2, vipKey.getUsedBy());
             statement.setString(3, vipKey.getVipName());
-
-            if (vipKey.getDurationInDays() != null) {
-                statement.setInt(4, vipKey.getDurationInDays());
-            } else {
-                statement.setNull(4, java.sql.Types.INTEGER);
-            }
+            statement.setInt(4, vipKey.getDurationInDays());
             statement.setBoolean(5, vipKey.isActive());
             statement.setBoolean(6, vipKey.isPermanent());
-            statement.setObject(7, Date.from(vipKey.getCreationDate().atStartOfDay(ZoneId.of("America/Sao_Paulo")).toInstant()));
+            statement.setDate(7, java.sql.Date.valueOf(vipKey.getCreationDate()));
             statement.executeUpdate();
         } catch (SQLException e) {
             logger.error("Error while saving vip key to database", e);
+        }
+    }
+    public void updateVipKey(VipKey vipKey) {
+        String sql = "UPDATE " + prefix + "vip_key SET used_by=?, vip_name=?, duration_in_days=?, is_active=?, is_permanent=?, creation_date=? WHERE key_code=?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, vipKey.getUsedBy());
+            statement.setString(2, vipKey.getVipName());
+            statement.setInt(3, vipKey.getDurationInDays());
+            statement.setBoolean(4, vipKey.isActive());
+            statement.setBoolean(5, vipKey.isPermanent());
+            statement.setDate(6, java.sql.Date.valueOf(vipKey.getCreationDate()));
+            statement.setString(7, vipKey.getKeyCode());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error while updating vip key in database", e);
         }
     }
 
@@ -201,12 +210,13 @@ public class VipRepository {
         return cashKeys;
     }
 
-    public VipKey getCashKeyByKeyCode(String keyCode) {
+    public VipKey getVipKeyByKeyCode(String keyCode,Boolean active) {
         VipKey vipKey = null;
-        String sql = "SELECT * FROM " + prefix + "vip_key WHERE key_code = ? LIMIT 1";
+        String sql = "SELECT * FROM " + prefix + "vip_key WHERE key_code = ? AND is_active = ? LIMIT 1";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, keyCode);
+            statement.setBoolean(2, active);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     vipKey = returnVipKey(resultSet);
@@ -231,14 +241,18 @@ public class VipRepository {
     }
 
     private Vip returnVip(ResultSet resultSet) throws SQLException {
+        resultSet.getDate("expiration_date");
+        LocalDate expirationDate = resultSet.wasNull() ? null : resultSet.getDate("expiration_date").toLocalDate();
+
         return new Vip(
                 resultSet.getInt("id"),
                 resultSet.getString("player_nick"),
                 resultSet.getString("vip_group"),
                 resultSet.getBoolean("is_active"),
                 resultSet.getInt("vip_days"),
+                resultSet.getBoolean("is_permanent"),
                 resultSet.getDate("creation_date").toLocalDate(),
-                resultSet.getDate("expiration_date").toLocalDate()
+                expirationDate
         );
     }
 }

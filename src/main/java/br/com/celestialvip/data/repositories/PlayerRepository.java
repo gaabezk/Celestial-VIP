@@ -1,7 +1,7 @@
 package br.com.celestialvip.data.repositories;
 
+import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.entities.PlayerData;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.eclipse.aether.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +15,9 @@ import java.sql.SQLException;
 public class PlayerRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(PlayerRepository.class);
-    private final String prefix;
-    private final DataSource dataSource;
+    private final DataSource dataSource = CelestialVIP.getDatabaseManager().getDataSource();
+    private final String prefix = CelestialVIP.getPlugin().getConfig().getString("config.database.tb_prefix");
 
-    public PlayerRepository(DataSource dataSource, FileConfiguration config) {
-        this.prefix = (String) config.get("config.database.tb_prefix");
-        this.dataSource = dataSource;
-    }
 
     public void savePlayerData(PlayerData playerData) throws RepositoryException {
         String sql = "INSERT INTO " + prefix + "player_data (nick, uuid) VALUES (?, ?)";

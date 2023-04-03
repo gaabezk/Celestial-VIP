@@ -8,17 +8,24 @@ commands:
     usage: /celestialvip reload
     permission: celestialvip.reload
     aliases: [ cv, celestial-vip ]
-  gerarchavevip:
+  gerarchave:
     description: Gera uma chave de ativação do vip escolhido.
-    usage: /gerarchavevip <vip> <dias>.
+    usage: |
+      /gerarchave vip <grupo> <dias>.
+      /gerarchave cash <quantidade>.
     permission: celestialvip.adm
-    aliases: [ generatevipkey ]
-  resgatarvip:
-    description: resgata seu vip usando o codigo da compra.
-    usage: /resgatarvip <id da transação>
-    aliases: [ redeemvip ]
-  resgatarcash:
-    description: resgata seu cash usando o codigo da compra.
-    usage: /resgatarcash <id da transação>.
-    aliases: [ redeemcash ]
+    aliases: [ generatekey ]
+  resgatar:
+    description: resgata seu vip/cash usando o codigo da compra.
+    usage: /resgatar [vip/cash] <id da transação>
+    aliases: [ redeem ]
+  usarchave:
+    description: usa uma chave vip existente.
+    usage: /usarchave [vip/cash] <chave>.
+    aliases: [ usekey ]
+  listarchaves:
+    description: lista chaves vips/cash existentes.
+    usage: /listarchaves [vip/cash].
+    permission: celestialvip.adm
+    aliases: [ listkeys ]
 

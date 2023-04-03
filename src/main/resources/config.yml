@@ -29,6 +29,7 @@ config:
   #   [console] = comando é executado pelo console.
   #   [player] = comando é executado pelo player.
   #   [message] = mensagem é enviada para o player.
+  #   [sound] = reproduz o som especifico.
   #   %player% = o nome do jogador aparecerá no lugar.
   #   %tag% = tag do vip escolhida aparecerá no lugar.
   #   %group% = nome do grupo vip escolhido aparecerá no lugar.
@@ -38,44 +39,48 @@ config:
     diamond:
       tag: '&bVIP DIAMOND'
       after-expiration-commands:
-        - '[console] lp user %player% parent set default'
+        - '[console] lp user %player% parent remove %group%'
       activation-commands:
-        - '[console] lp user %player% parent set %group%'
+        - '[console] lp user %player% parent add %group%'
         - '[console] give %player% netherite_sword 1'
         - '[console] give %player% netherite_helmet 1'
         - '[console] give %player% netherite_chestplate 1'
         - '[console] give %player% netherite_leggings 1'
         - '[console] give %player% netherite_boots 1'
         - '[console] eco give %player% 1000'
+        - '[sound] ENTITY_PLAYER_LEVELUP'
     #
     gold:
       tag: '&eVIP GOLD'
       after-expiration-commands:
-        - '[console] lp user %player% parent set default'
+        - '[console] lp user %player% parent remove %group%'
       activation-commands:
-        - '[console] lp user %player% parent set %group%'
+        - '[console] lp user %player% parent add %group%'
         - '[console] give %player% netherite_sword 1'
         - '[console] give %player% netherite_helmet 1'
         - '[console] give %player% netherite_chestplate 1'
         - '[console] give %player% netherite_leggings 1'
         - '[console] give %player% netherite_boots 1'
         - '[console] eco give %player% 500'
+        - '[sound] ENTITY_PLAYER_LEVELUP'
     #
     iron:
       tag: '&2VIP IRON'
       after-expiration-commands:
-        - '[console] lp user %player% parent set default '
+        - '[console] lp user %player% parent remove %group%'
       activation-commands:
-        - '[console] lp user %player% parent set %group%'
+        - '[console] lp user %player% parent add %group%'
         - '[console] give %player% netherite_sword 1'
         - '[console] give %player% netherite_helmet 1'
         - '[console] give %player% netherite_chestplate 1'
         - '[console] give %player% netherite_leggings 1'
         - '[console] give %player% netherite_boots 1'
         - '[console] eco give %player% 100'
+        - '[sound] ENTITY_PLAYER_LEVELUP'
   #
   # Use %value% como parametro para a quantidade de cash.
   cash:
     activation-commands:
       - '[console] cash set %player% %value%'
       - '[message] voce comprou %value% em cash'
+      - '[sound] ENTITY_PLAYER_LEVELUP'

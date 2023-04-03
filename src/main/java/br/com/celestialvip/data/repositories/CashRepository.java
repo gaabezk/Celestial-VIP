@@ -1,7 +1,8 @@
 package br.com.celestialvip.data.repositories;
 
+import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.keys.CashKey;
-import org.bukkit.configuration.file.FileConfiguration;
+import br.com.celestialvip.models.keys.VipKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,13 +20,9 @@ import java.util.List;
 public class CashRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(VipRepository.class);
-    private final DataSource dataSource;
-    private final String prefix;
+    private final DataSource dataSource = CelestialVIP.getDatabaseManager().getDataSource();
+    private final String prefix = CelestialVIP.getPlugin().getConfig().getString("config.database.tb_prefix");
 
-    public CashRepository(DataSource dataSource, FileConfiguration config) {
-        this.dataSource = dataSource;
-        this.prefix = (String) config.get("config.database.tb_prefix");
-    }
 
     public void saveMercadoPagoCashCode(String mercadoPagoCashKey, String playerNick) {
         String sql = "INSERT INTO " + prefix + "mercado_pago_cash_codes (key_code,creation_date,player_nick) VALUES (?, ?, ?)";
@@ -63,12 +60,27 @@ public class CashRepository {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, cashKey.getKeyCode());
             statement.setString(2, cashKey.getUsedBy());
-            statement.setDouble(3, cashKey.getAmountOfCash());
+            statement.setInt(3, cashKey.getAmountOfCash());
             statement.setBoolean(4, cashKey.isActive());
             statement.setObject(5, Date.from(cashKey.getCreationDate().atStartOfDay(ZoneId.of("America/Sao_Paulo")).toInstant()));
             statement.executeUpdate();
         } catch (SQLException e) {
             logger.error("Error while saving cash key to database", e);
+        }
+    }
+
+    public void updateCashKey(CashKey cashKey) {
+        String sql = "UPDATE " + prefix + "cash_key SET used_by=?, is_active=?, amount_of_cash=?, creation_date=? WHERE key_code=?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, cashKey.getUsedBy());
+            statement.setBoolean(2, cashKey.isActive());
+            statement.setInt(3, cashKey.getAmountOfCash());
+            statement.setDate(4, java.sql.Date.valueOf(cashKey.getCreationDate()));
+            statement.setString(5, cashKey.getKeyCode());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error while updating cash key in database", e);
         }
     }
 
@@ -89,12 +101,13 @@ public class CashRepository {
         return cashKeys;
     }
 
-    public CashKey getCashKeyByKeyCode(String keyCode) {
+    public CashKey getCashKeyByKeyCode(String keyCode,Boolean active) {
         CashKey cashKey = null;
-        String sql = "SELECT * FROM " + prefix + "cash_key WHERE key_code = ? LIMIT 1";
+        String sql = "SELECT * FROM " + prefix + "cash_key WHERE key_code = ? AND is_active = ? LIMIT 1";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, keyCode);
+            statement.setBoolean(2, active);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     cashKey = returnCashKey(resultSet);
@@ -110,7 +123,7 @@ public class CashRepository {
         return new CashKey(
                 resultSet.getString("key_code"),
                 resultSet.getString("used_by"),
-                resultSet.getDouble("amount_of_cash"),
+                resultSet.getInt("amount_of_cash"),
                 resultSet.getBoolean("is_active"),
                 resultSet.getDate("creation_date").toLocalDate()
         );

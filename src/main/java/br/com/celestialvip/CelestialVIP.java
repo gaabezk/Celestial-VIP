@@ -1,82 +1,78 @@
 package br.com.celestialvip;
 
+import br.com.celestialvip.commands.GenerateKeyCommand;
+import br.com.celestialvip.commands.ListKeysCommand;
+import br.com.celestialvip.commands.RedeemCommand;
+import br.com.celestialvip.commands.UseKeyCommand;
 import br.com.celestialvip.data.DatabaseManager;
+import br.com.celestialvip.data.repositories.CashRepository;
+import br.com.celestialvip.data.repositories.PlayerRepository;
+import br.com.celestialvip.data.repositories.VipRepository;
+import br.com.celestialvip.mercadopago.MercadoPagoAPI;
 import br.com.celestialvip.services.ActivationService;
 import br.com.celestialvip.services.DeactivationService;
-import br.com.celestialvip.services.VipKeyService;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.eclipse.aether.RepositoryException;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.SQLException;
 import java.util.Timer;
 
 
 public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
-    DatabaseManager databaseManager = new DatabaseManager(getConfig(), getDataFolder());
-    VipKeyService vipKeyService = new VipKeyService(databaseManager.getDataSource(), getConfig());
-    ActivationService activationService = new ActivationService(databaseManager.getDataSource(), getConfig());
-    List<String> vips = new ArrayList<>();
+
+    private static CelestialVIP plugin ;
+    private static DatabaseManager databaseManager;
+    private static MercadoPagoAPI mercadoPagoAPI;
+    private static ActivationService activationService;
+    private static CashRepository cashRepository;
+    private static PlayerRepository playerRepository;
+    private static VipRepository vipRepository;
+    Timer timer = new Timer();
+
+    public CelestialVIP() {
+        plugin = this;
+        databaseManager = new DatabaseManager();
+        mercadoPagoAPI = new MercadoPagoAPI();
+        activationService = new ActivationService();
+        cashRepository = new CashRepository();
+        playerRepository = new PlayerRepository();
+        vipRepository = new VipRepository();
+    }
 
     @Override
     public void onEnable() {
+        plugin = this;
         getLogger().info("\033[92mBy: gabezk | Obrigado por usar!\033[0m");
         saveDefaultConfig(); // cria o arquivo de configuração padrão se ele não existir
         getCommand("celestialvip").setExecutor(this);
-        getCommand("gerarchavevip").setExecutor(this);
-        getCommand("resgatarvip").setExecutor(this);
-        getCommand("resgatarcash").setExecutor(this);
+        getCommand("gerarchave").setExecutor(new GenerateKeyCommand());
+        getCommand("resgatar").setExecutor(new RedeemCommand());
+        getCommand("usarchave").setExecutor(new UseKeyCommand());
+        getCommand("listarchaves").setExecutor(new ListKeysCommand());
         checkVipExpiration();
-    }
-
-    public void checkVipExpiration() {
-        int vipExpirationCheckInterval = getConfig().getInt("config.vip-expiration-check-interval");
-        Timer timer = new Timer();
-        timer.schedule(new DeactivationService(databaseManager.getDataSource(), getConfig()), 0, vipExpirationCheckInterval * 1000);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
-        try {
-            if (vipKeyService.gerarChaveVip(sender, command, label, args)) {
-                return true;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-
-        try {
-            if (activationService.redeemVip(sender, command, label, args)) {
-                return true;
-            }
-        } catch (IOException | RepositoryException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            if (activationService.redeemCash(sender, command, label, args)) {
-                return true;
-            }
-        } catch (IOException | RepositoryException e) {
-            throw new RuntimeException(e);
-        }
 
         if (command.getName()
                 .equalsIgnoreCase("celestialvip") && args
                 .length == 1 && args[0]
                 .equalsIgnoreCase("reload")) {
             try {
+                databaseManager.getConnection().close();
+                cancelTimer();
                 saveDefaultConfig();
                 reloadConfig();
-                databaseManager = new DatabaseManager(getConfig(), getDataFolder());
-                activationService = new ActivationService(databaseManager.getDataSource(), getConfig());
-                vipKeyService = new VipKeyService(databaseManager.getDataSource(), getConfig());
+                databaseManager = new DatabaseManager();
+                mercadoPagoAPI = new MercadoPagoAPI();
+                playerRepository = new PlayerRepository();
+                vipRepository = new VipRepository();
+                cashRepository = new CashRepository();
+                activationService = new ActivationService();
+                checkVipExpiration();
                 System.gc();
             } catch (Exception e) {
                 sender.sendMessage(e.getMessage());
@@ -87,8 +83,52 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
         return false;
     }
 
+    public void checkVipExpiration() {
+        int vipExpirationCheckInterval = getConfig().getInt("config.vip-expiration-check-interval");
+        timer.schedule(new DeactivationService(), 0, vipExpirationCheckInterval * 1000);
+    }
+
+    public void cancelTimer(){
+        timer.cancel();
+        timer.purge();
+        timer = new Timer();
+    }
+
     @Override
     public void onDisable() {
+        try {
+            databaseManager.getConnection().close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         getLogger().info("\033[91mPlugin desativado!\033[0m");
+    }
+
+    public static CelestialVIP getPlugin() {
+        return plugin;
+    }
+
+    public static DatabaseManager getDatabaseManager() {
+        return databaseManager;
+    }
+
+    public static ActivationService getActivationService() {
+        return activationService;
+    }
+
+    public static MercadoPagoAPI getMercadoPagoAPI() {
+        return mercadoPagoAPI;
+    }
+
+    public static CashRepository getCashRepository() {
+        return cashRepository;
+    }
+
+    public static PlayerRepository getPlayerRepository() {
+        return playerRepository;
+    }
+
+    public static VipRepository getVipRepository() {
+        return vipRepository;
     }
 }

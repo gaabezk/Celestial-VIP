@@ -1,5 +1,6 @@
 package br.com.celestialvip.data;
 
+import br.com.celestialvip.CelestialVIP;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
@@ -28,11 +29,11 @@ public class DatabaseManager {
     private String user;
     private String password;
     private String tbPrefix;
-    private File dataFolder;
     private HikariDataSource dataSource;
+    private File dataFolder = CelestialVIP.getPlugin().getDataFolder();
+    private FileConfiguration config = CelestialVIP.getPlugin().getConfig();
 
-
-    public DatabaseManager(FileConfiguration config, File dataFolder) {
+    public DatabaseManager() {
 
         this.drive = config.getString("config.database.drive");
         this.host = config.getString("config.database.host");
@@ -41,7 +42,6 @@ public class DatabaseManager {
         this.user = config.getString("config.database.user");
         this.password = config.getString("config.database.password");
         this.tbPrefix = config.getString("config.database.tb_prefix");
-        this.dataFolder = dataFolder;
 
         createDataSource();
         creteTables();
@@ -55,7 +55,6 @@ public class DatabaseManager {
         HikariConfig hikariConfig = new HikariConfig();
 
         try {
-
             switch (Objects.requireNonNull(drive).toLowerCase()) {
                 case "mysql":
                     hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
@@ -110,25 +109,25 @@ public class DatabaseManager {
 
                     case "mysql":
                         playerData = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "player_data (nick VARCHAR(60) PRIMARY KEY, uuid VARCHAR(100) NOT NULL)";
-                        vip = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip (id INT AUTO_INCREMENT PRIMARY KEY, player_nick VARCHAR(60), vip_group VARCHAR(60) NOT NULL, is_active BOOLEAN NOT NULL, vip_days INT NOT NULL, creation_date DATE NOT NULL, expiration_date DATE NOT NULL, FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
+                        vip = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip (id INT AUTO_INCREMENT PRIMARY KEY, player_nick VARCHAR(60), vip_group VARCHAR(60) NOT NULL, is_active BOOLEAN NOT NULL, vip_days INT, is_permanent BOOLEAN NOT NULL, creation_date DATE NOT NULL, expiration_date DATE, FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
                         vipKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip_key (key_code VARCHAR(255) PRIMARY KEY, vip_name VARCHAR(255) NOT NULL, duration_in_days INT, is_active BOOLEAN NOT NULL, is_permanent BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by VARCHAR(60))";
-                        cashKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "cash_key (key_code VARCHAR(255) PRIMARY KEY, quantity DOUBLE NOT NULL, is_active BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by VARCHAR(60))";
+                        cashKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "cash_key (key_code VARCHAR(255) PRIMARY KEY, amount_of_cash INT NOT NULL, is_active BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by VARCHAR(60))";
                         mercadoPagoVipKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "mercado_pago_vip_codes (key_code VARCHAR(255) PRIMARY KEY, creation_date DATE NOT NULL, player_nick VARCHAR(60), FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
                         mercadoPagoCashKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "mercado_pago_cash_codes (key_code VARCHAR(255) PRIMARY KEY, creation_date DATE NOT NULL, player_nick VARCHAR(60), FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
                         break;
                     case "postgresql":
                         playerData = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "player_data (nick VARCHAR(60) PRIMARY KEY, uuid VARCHAR(100) NOT NULL)";
-                        vip = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip (id SERIAL PRIMARY KEY, player_nick VARCHAR(60), vip_group VARCHAR(60) NOT NULL, is_active BOOLEAN NOT NULL, vip_days INT NOT NULL, creation_date DATE NOT NULL, expiration_date DATE NOT NULL, FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
+                        vip = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip (id SERIAL PRIMARY KEY, player_nick VARCHAR(60), vip_group VARCHAR(60) NOT NULL, is_active BOOLEAN NOT NULL, vip_days INT, is_permanent BOOLEAN NOT NULL, creation_date DATE NOT NULL, expiration_date DATE, FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
                         vipKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip_key (key_code VARCHAR(255) PRIMARY KEY, vip_name VARCHAR(255) NOT NULL, duration_in_days INT, is_active BOOLEAN NOT NULL, is_permanent BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by VARCHAR(60))";
-                        cashKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "cash_key (key_code VARCHAR(255) PRIMARY KEY, quantity FLOAT NOT NULL, is_active BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by VARCHAR(60))";
+                        cashKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "cash_key (key_code VARCHAR(255) PRIMARY KEY, amount_of_cash INT NOT NULL, is_active BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by VARCHAR(60))";
                         mercadoPagoVipKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "mercado_pago_vip_codes (key_code VARCHAR(255) PRIMARY KEY, creation_date DATE NOT NULL, player_nick VARCHAR(60), FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
                         mercadoPagoCashKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "mercado_pago_cash_codes (key_code VARCHAR(255) PRIMARY KEY, creation_date DATE NOT NULL, player_nick VARCHAR(60), FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
                         break;
                     default:
                         playerData = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "player_data (nick TEXT PRIMARY KEY, uuid TEXT NOT NULL)";
-                        vip = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip (id INTEGER PRIMARY KEY AUTOINCREMENT, player_nick TEXT, vip_group TEXT NOT NULL, is_active BOOLEAN NOT NULL, vip_days INTEGER NOT NULL, creation_date DATE NOT NULL, expiration_date DATE NOT NULL, FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
+                        vip = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip (id INTEGER PRIMARY KEY AUTOINCREMENT, player_nick TEXT, vip_group TEXT NOT NULL, is_active BOOLEAN NOT NULL, vip_days INTEGER, is_permanent BOOLEAN NOT NULL, creation_date DATE NOT NULL, expiration_date DATE, FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
                         vipKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "vip_key (key_code TEXT PRIMARY KEY, vip_name TEXT NOT NULL, duration_in_days INTEGER, is_active BOOLEAN NOT NULL, is_permanent BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by TEXT)";
-                        cashKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "cash_key (key_code TEXT PRIMARY KEY, quantity REAL NOT NULL, is_active BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by TEXT)";
+                        cashKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "cash_key (key_code TEXT PRIMARY KEY, amount_of_cash INTEGER NOT NULL, is_active BOOLEAN NOT NULL, creation_date DATE NOT NULL, used_by TEXT)";
                         mercadoPagoVipKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "mercado_pago_vip_codes (key_code TEXT PRIMARY KEY, creation_date DATE NOT NULL, player_nick TEXT, FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
                         mercadoPagoCashKey = "CREATE TABLE IF NOT EXISTS " + tbPrefix + "mercado_pago_cash_codes (key_code TEXT PRIMARY KEY, creation_date DATE NOT NULL, player_nick TEXT, FOREIGN KEY (player_nick) REFERENCES " + tbPrefix + "player_data(nick))";
                         break;

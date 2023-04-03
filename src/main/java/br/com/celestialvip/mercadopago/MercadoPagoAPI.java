@@ -1,11 +1,11 @@
 package br.com.celestialvip.mercadopago;
 
+import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.entities.PayamentStatus;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import okhttp3.*;
 import okio.BufferedSink;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -13,15 +13,10 @@ import java.io.IOException;
 public class MercadoPagoAPI {
 
     private final String BASE_URL = "https://api.mercadopago.com";
-    private final String CLIENT_ID;
-    private final String CLIENT_SECRET;
-    private final String ACCESS_TOKEN;
+    private final String CLIENT_ID = CelestialVIP.getPlugin().getConfig().getString("config.mercadopago.CLIENT_ID");
+    private final String CLIENT_SECRET = CelestialVIP.getPlugin().getConfig().getString("config.mercadopago.CLIENT_SECRET");
+    private final String ACCESS_TOKEN = getAccessToken();
 
-    public MercadoPagoAPI(FileConfiguration config) {
-        CLIENT_ID = config.getString("config.mercadopago.CLIENT_ID");
-        CLIENT_SECRET = config.getString("config.mercadopago.CLIENT_SECRET");
-        ACCESS_TOKEN = getAccessToken();
-    }
 
     public PayamentStatus getPaymentStatus(String paymentId) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()

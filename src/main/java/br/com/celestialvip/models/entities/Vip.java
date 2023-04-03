@@ -17,18 +17,22 @@ public class Vip {
     private String group;
     private boolean isActive;
     private int vipDays;
+    private boolean isPermanent;
     private LocalDate creationDate;
     private LocalDate expirationDate;
 
     public void definirDatas() {
-        LocalDate dataAtual = LocalDate.now(BRAZIL_TIMEZONE);
-        LocalDate dataExpiracao = dataAtual.plusDays(vipDays);
-
-        this.creationDate = dataAtual;
-        this.expirationDate = dataExpiracao;
+        this.creationDate = LocalDate.now(BRAZIL_TIMEZONE);
+        this.expirationDate = LocalDate.now(BRAZIL_TIMEZONE).plusDays(vipDays);
+        if(vipDays==0){
+            this.expirationDate = null;
+        }
     }
 
     public boolean isVipExpired() {
+        if(expirationDate==null){
+            return false;
+        }
         LocalDate today = LocalDate.now(BRAZIL_TIMEZONE);
         return today.isAfter(expirationDate);
     }

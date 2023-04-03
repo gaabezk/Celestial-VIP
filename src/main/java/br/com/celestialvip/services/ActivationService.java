@@ -1,184 +1,26 @@
 package br.com.celestialvip.services;
 
 import br.com.celestialvip.CelestialVIP;
-import br.com.celestialvip.data.repositories.CashRepository;
-import br.com.celestialvip.data.repositories.PlayerRepository;
-import br.com.celestialvip.data.repositories.VipRepository;
-import br.com.celestialvip.mercadopago.MercadoPagoAPI;
-import br.com.celestialvip.models.entities.PayamentStatus;
 import br.com.celestialvip.models.entities.PlayerData;
 import br.com.celestialvip.models.entities.Vip;
 import br.com.celestialvip.utils.Utilities;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.eclipse.aether.RepositoryException;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import static org.bukkit.Bukkit.getServer;
 
 public class ActivationService {
 
-    private final MercadoPagoAPI mercadoPagoAPI;
-    private final FileConfiguration config;
-    private final VipRepository vipRepository;
-    private final CashRepository cashRepository;
-    private final PlayerRepository playerRepository;
+    private final FileConfiguration config = CelestialVIP.getPlugin().getConfig();
 
-    public ActivationService(DataSource dataSource, FileConfiguration config) {
-        this.mercadoPagoAPI = new MercadoPagoAPI(config);
-        this.playerRepository = new PlayerRepository(dataSource, config);
-        this.vipRepository = new VipRepository(dataSource, config);
-        this.cashRepository = new CashRepository(dataSource, config);
-        this.config = config;
-    }
-
-    public boolean redeemCash(CommandSender sender, Command cmd, String label, String[] args) throws IOException, RepositoryException {
-
-        if (cmd.getName().equalsIgnoreCase("resgatarcash") && args.length == 1) {
-
-            if (!(sender instanceof Player)) {
-                sender.sendMessage("Este comando só pode ser executado por um jogador.");
-                return true;
-            }
-
-            Player player = (Player) sender;
-
-            String code = cashRepository.getMercadoPagoCashCode(args[0]);
-
-            if (code != null) {
-                sender.sendMessage("Essa chave ja foi usada!");
-                return true;
-            }
-
-            PayamentStatus result = mercadoPagoAPI.getPaymentStatus(args[0]);
-
-            if (result.getStatus() == null) {
-                sender.sendMessage("Pagamento nao encontrado, verifique o codigo de pagamento e tente mais tarde");
-                return true;
-            }
-
-            String[] partes = result.getExternalReference().split("\\.");
-
-            partes = Arrays.stream(partes)
-                    .filter(s -> !s.isEmpty())
-                    .toArray(String[]::new);
-
-            if (partes.length != 1) {
-                player.sendMessage("Essa não é uma chave de cash, por favor tente /resgatarvip <codigo>");
-                return true;
-            }
-
-            if (!result.getStatus().equals("approved")) {
-                sender.sendMessage("Pagamento ainda nao foi aprovado, tente novamente mais tarde!");
-                return true;
-            }
-
-            activateCash(player, partes[0]);
-            cashRepository.saveMercadoPagoCashCode(args[0], player.getName());
-
-            return true;
-        }
-        return false;
-    }
-
-    public boolean redeemVip(CommandSender sender, Command cmd, String label, String[] args) throws IOException, RepositoryException {
-        if (cmd.getName().equalsIgnoreCase("resgatarvip") && args.length == 1) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage("Este comando só pode ser executado por um jogador.");
-                return true;
-            }
-
-            Player player = (Player) sender;
-
-            List<Vip> vips = vipRepository.getAllVipsByPlayerNick(player.getName(), true);
-            if (!vips.isEmpty()) {
-                player.sendMessage("Voce ja esta no vip " + vips.get(0).getGroup() + ", aguarde o termino do vip atual para ativar o proximo! voce pode usar a mesma chave!");
-                return true;
-            }
-
-            String code = vipRepository.getMercadoPagoVipKey(args[0]);
-
-            if (code != null) {
-                sender.sendMessage("Essa chave ja foi usada!");
-                return true;
-            }
-
-            PayamentStatus result = mercadoPagoAPI.getPaymentStatus(args[0]);
-
-            if (result.getStatus() == null) {
-                sender.sendMessage("Pagamento nao encontrado, verifique o codigo de pagamento e tente mais tarde");
-                return true;
-            }
-
-            String[] partes = result.getExternalReference().split("\\.");
-
-            partes = Arrays.stream(partes)
-                    .filter(s -> !s.isEmpty())
-                    .toArray(String[]::new);
-
-            if (partes.length != 2) {
-                player.sendMessage("Essa não é uma chave vip, por favor tente /resgatarcash <codigo>");
-                return true;
-            }
-
-            if (!result.getStatus().equals("approved")) {
-                sender.sendMessage("Pagamento ainda nao foi aprovado, tente novamente mais tarde!");
-                return true;
-            }
-
-            List<String> vipsGroups = new ArrayList<>(Objects.requireNonNull(config.getConfigurationSection("config.vips")).getKeys(false));
-            if (!vipsGroups.contains(partes[0])) {
-                player.sendMessage("Me desculpe, parece que a staff deixou passar um pequeno erro e seu vip terá que ser ativo manualmente, contate um de nossos Staffs para lhe ajudar!");
-                return true;
-            }
-
-            activateVip(player, partes[0], partes[1]);
-            vipRepository.saveMercadoPagoVipKey(args[0], player.getName());
-
-            return true;
-        }
-        return false;
-    }
-
-    private void activateCash(Player player, String value) throws RepositoryException {
-        ConfigurationSection cashSection = config.getConfigurationSection("config.cash");
-
-        if (cashSection != null) {
-
-            PlayerData playerData = playerRepository.getPlayerDataByNick(player.getName());
-            if (playerData == null) {
-                playerRepository.savePlayerData(new PlayerData(player.getName(), player.getUniqueId().toString()));
-            }
-
-            List<String> activationCommands = cashSection.getStringList("activation-commands"); // obtém a lista de comandos de ativação para o tipo de VIP escolhido
-            for (String command : activationCommands) {
-
-                command = replaceCashVariables(command, player, value);
-
-                if (command.startsWith("[console] ")) {
-                    command = command.replace("&", "§");
-                    CelestialVIP.getPlugin(CelestialVIP.class).getServer().dispatchCommand(getServer().getConsoleSender(), command.substring(10)); // executa o comando como console
-                } else if (command.startsWith("[player] ")) {
-                    player.performCommand(command.substring(9)); // executa o comando como jogador
-                } else if (command.startsWith("[message] ")) {
-                    command = command.replace("&", "§");
-                    player.sendMessage(command.substring(10)); // envia a mensagem para o jogador
-                }
-            }
-        }
-    }
-
-    private void activateVip(Player player, String vipType, String days) throws RepositoryException {
+    public void activateVip(Player player, String vipType, String days, boolean isPermanent) throws RepositoryException {
         ConfigurationSection vipSection = config.getConfigurationSection("config.vips." + vipType); // obtém a seção de configuração para o tipo de VIP escolhido
 
         if (vipSection != null) {
@@ -188,13 +30,14 @@ public class ActivationService {
             vip.setPlayerNick(player.getName());
             vip.setGroup(vipType);
             vip.setActive(true);
+            vip.setPermanent(isPermanent);
             vip.definirDatas();
 
-            PlayerData playerData = playerRepository.getPlayerDataByNick(player.getName());
+            PlayerData playerData = CelestialVIP.getPlayerRepository().getPlayerDataByNick(player.getName());
             if (playerData == null) {
-                playerRepository.savePlayerData(new PlayerData(player.getName(), player.getUniqueId().toString()));
+                CelestialVIP.getPlayerRepository().savePlayerData(new PlayerData(player.getName(), player.getUniqueId().toString()));
             }
-            vipRepository.saveVip(vip);
+            CelestialVIP.getVipRepository().saveVip(vip);
 
             List<String> activationCommands = vipSection.getStringList("activation-commands"); // obtém a lista de comandos de ativação para o tipo de VIP escolhido
             for (String command : activationCommands) {
@@ -209,12 +52,19 @@ public class ActivationService {
                 } else if (command.startsWith("[message] ")) {
                     command = command.replace("&", "§");
                     player.sendMessage(command.substring(10)); // envia a mensagem para o jogador
+                } else if (command.startsWith("[sound] ")){
+                    player.playSound(player.getLocation(), Sound.valueOf(command.substring(8).toUpperCase()), 1.0f, 1.0f);
+
                 }
             }
 
             if (config.getBoolean("config.announce.active")) {
                 String message = Utilities.translateColorCodes(config.getString("config.prefix") + " " + replaceVipVariables(config.getString("config.announce.chat-and-actionbar.message"), player, days, vipType, vipSection));
                 String announceType = config.getString("config.announce.type");
+
+                if(announceType == null){
+                    announceType = "chat";
+                }
 
                 switch (announceType) {
                     case "chat":
@@ -234,6 +84,36 @@ public class ActivationService {
                             p.sendTitle(title, subTitle);
                         }
                         break;
+                }
+            }
+        }
+    }
+
+    public void activateCash(Player player, String value) throws RepositoryException {
+        ConfigurationSection cashSection = config.getConfigurationSection("config.cash");
+
+        if (cashSection != null) {
+
+            PlayerData playerData = CelestialVIP.getPlayerRepository().getPlayerDataByNick(player.getName());
+            if (playerData == null) {
+                CelestialVIP.getPlayerRepository().savePlayerData(new PlayerData(player.getName(), player.getUniqueId().toString()));
+            }
+
+            List<String> activationCommands = cashSection.getStringList("activation-commands"); // obtém a lista de comandos de ativação para o tipo de VIP escolhido
+            for (String command : activationCommands) {
+
+                command = replaceCashVariables(command, player, value);
+
+                if (command.startsWith("[console] ")) {
+                    command = command.replace("&", "§");
+                    CelestialVIP.getPlugin(CelestialVIP.class).getServer().dispatchCommand(getServer().getConsoleSender(), command.substring(10)); // executa o comando como console
+                } else if (command.startsWith("[player] ")) {
+                    player.performCommand(command.substring(9)); // executa o comando como jogador
+                } else if (command.startsWith("[message] ")) {
+                    command = command.replace("&", "§");
+                    player.sendMessage(command.substring(10)); // envia a mensagem para o jogador
+                } else if (command.startsWith("[sound] ")){
+                    player.playSound(player.getLocation(), Sound.valueOf(command.substring(8).toUpperCase()), 1.0f, 1.0f);
                 }
             }
         }
