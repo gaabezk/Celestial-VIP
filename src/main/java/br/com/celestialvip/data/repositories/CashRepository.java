@@ -2,7 +2,6 @@ package br.com.celestialvip.data.repositories;
 
 import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.keys.CashKey;
-import br.com.celestialvip.models.keys.VipKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +80,28 @@ public class CashRepository {
             statement.executeUpdate();
         } catch (SQLException e) {
             logger.error("Error while updating cash key in database", e);
+        }
+    }
+
+    public void deleteCashKey(String key) {
+        String sql = "DELETE FROM " + prefix + "cash_key WHERE key_code = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, key);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error while deleting cash key in database", e);
+        }
+    }
+
+    public void deleteAllCashKeys(Boolean isActive) {
+        String sql = "DELETE FROM " + prefix + "cash_key WHERE is_active = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setBoolean(1, isActive);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error while deleting all cash keys in database", e);
         }
     }
 

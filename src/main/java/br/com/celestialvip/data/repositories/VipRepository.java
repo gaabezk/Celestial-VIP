@@ -50,7 +50,11 @@ public class VipRepository {
             statement.setInt(4, vip.getVipDays());
             statement.setBoolean(5, vip.isPermanent());
             statement.setDate(6, java.sql.Date.valueOf(vip.getCreationDate()));
-            statement.setDate(7, java.sql.Date.valueOf(vip.getExpirationDate()));
+            if (vip.getExpirationDate() != null) {
+                statement.setDate(7, java.sql.Date.valueOf(vip.getExpirationDate()));
+            } else {
+                statement.setNull(7, java.sql.Types.DATE);
+            }
             statement.setInt(8, vip.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -192,6 +196,29 @@ public class VipRepository {
             logger.error("Error while updating vip key in database", e);
         }
     }
+
+    public void deleteVipKey(String key) {
+        String sql = "DELETE FROM " + prefix + "vip_key WHERE key_code = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, key);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error while deleting vip key in database", e);
+        }
+    }
+
+    public void deleteAllVipKeys(Boolean isActive) {
+        String sql = "DELETE FROM " + prefix + "vip_key WHERE is_active = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setBoolean(1, isActive);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error while deleting all vip keys in database", e);
+        }
+    }
+
 
     public List<VipKey> getAllVipKeys(boolean active) {
         List<VipKey> cashKeys = new ArrayList<>();
