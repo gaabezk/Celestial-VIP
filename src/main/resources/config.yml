@@ -35,6 +35,7 @@ config:
   #   %group% = nome do grupo vip escolhido aparecerá no lugar.
   #   %days% = quantidade de dias vip aparece no lugar.
   #   %value% = quantidade de cash aparecerá no lugar.
+  #
   vips:
     diamond:
       tag: '&bVIP DIAMOND'

@@ -8,7 +8,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.bukkit.configuration.file.FileConfiguration;
 
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;

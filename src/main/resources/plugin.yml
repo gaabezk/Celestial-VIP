@@ -3,29 +3,52 @@ version: '${project.version}'
 main: br.com.celestialvip.CelestialVIP
 api-version: 1.19
 commands:
-  celestialvip:
-    description: Recarrega o CelestialVIP.
-    usage: /celestialvip reload
-    permission: celestialvip.reload
-    aliases: [ cv, celestial-vip ]
+  resgatar:
+    description: Resgata seu vip/cash usando o codigo da compra.
+    usage: /resgatar [vip/cash] <id da transação>
+    permission: celestialvip.user, celestialvip.redeem
+    aliases: [ redeem ]
+  usarchave:
+    description: Usa uma chave vip existente.
+    usage: /usarchave [vip/cash] <chave>.
+    permission: celestialvip.user, celestialvip.usekey
+    aliases: [ usekey ]
+  infovip:
+    description: Mostra informações sobre os vips.
+    usage: /infovip <player>.
+    permission: celestialvip.user, celestialvip.infvip
+    aliases: [ vipinfo ]
   gerarchave:
     description: Gera uma chave de ativação do vip escolhido.
     usage: |
       /gerarchave vip <grupo> <dias>.
       /gerarchave cash <quantidade>.
-    permission: celestialvip.adm
+    permission: celestialvip.adm, celestialvip.genkey
     aliases: [ generatekey ]
-  resgatar:
-    description: resgata seu vip/cash usando o codigo da compra.
-    usage: /resgatar [vip/cash] <id da transação>
-    aliases: [ redeem ]
-  usarchave:
-    description: usa uma chave vip existente.
-    usage: /usarchave [vip/cash] <chave>.
-    aliases: [ usekey ]
   listarchaves:
-    description: lista chaves vips/cash existentes.
+    description: Lista chaves vips/cash existentes.
     usage: /listarchaves [vip/cash].
-    permission: celestialvip.adm
+    permission: celestialvip.adm, celestialvip.listkeys
     aliases: [ listkeys ]
-
+  apagarchave:
+    description: Deleta uma chave específica ou todas.
+    usage: |
+      /apagarchave vip/cash all.
+      /apagarchave vip/cash <chave>.
+    permission: celestialvip.adm, celestialvip.delkey
+    aliases: [ deletekey ]
+  darvip:
+    description: Dá VIP a um jogador específico.
+    usage: /darvip <player> <group> <days>/perm.
+    permission: celestialvip.adm, celestialvip.givip
+    aliases: [ givevip ]
+  removervip:
+    description: Remove o VIP de um jogador específico.
+    usage: /removervip <player> <group>.
+    permission: celestialvip.adm, celestialvip.remvip
+    aliases: [ removevip ]
+  celestialvip:
+    description: Recarrega o CelestialVIP.
+    usage: /celestialvip reload
+    permission: celestialvip.reload
+    aliases: [ cv, celestial-vip ]

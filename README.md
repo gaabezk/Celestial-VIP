@@ -7,6 +7,7 @@ resgatar VIP ou Cash, gerar chaves de ativação e monitorar o tempo restante do
 
 - Integração com Mercado Pago;
 - Resgate de VIP ou Cash com um código;
+- Remoção de VIP automatica.
 - Gerar chaves de ativação para VIP ou Cash;
 - Uso de chaves existentes;
 - Mostrar os dias restantes do VIP para jogadores VIP;
@@ -15,21 +16,28 @@ resgatar VIP ou Cash, gerar chaves de ativação e monitorar o tempo restante do
 - Apagar uma chave específica;
 - Tirar VIP de um jogador específico;
 - Avisar quando um jogador ativa um VIP (chat, actionbar, title ou bossbar);
-- Remoção de VIP automatica.
 
-## Comandos
+## Comandos e Permissões
 
-- `/resgatar <vip/cash> <codigo>` - resgatar o VIP ou Cash com o código de pagamento;
-- `/usarchave <vip/cash> <chave>` - usar uma chave existente para ativar o VIP ou Cash;
-- `/tempovip` - mostrar os dias restantes do VIP do jogador atual;
-- `/tempovip <jogador>` - mostrar os dias restantes do VIP do jogador especificado;
-- `/gerarkeyvip <vip> <dias>` - gerar uma chave de ativação do VIP com o número especificado de dias;
-- `/gerarkeycash <qtd>` - gerar uma chave de ativação de um valor específico de Cash;
-- `/chaves` - listar todas as chaves ativas;
-- `/apagarchave <chave>` - apagar uma chave específica;
-- `/apagarchaves` - apagar todas as chaves ativas (necessario confirmar).
-- `/tirarvip <jogador>` - tirar o VIP de um jogador específico;
-- `/celestialvip reload` - recarregar todas as configurações do plugin Celestial VIP;
+- `/resgatar vip/cash <codigo>` - resgatar o VIP ou Cash com o código de pagamento - `celestialvip.redeem`.
+- `/usarchave vip/cash <chave>` - usar uma chave existente para ativar o VIP ou Cash- `celestialvip.usekey`.
+- `/infovip` - mostrar os dias restantes do VIP do jogador atual - `celestialvip.infvip`.
+- `/infovip <jogador>` - mostrar os dias restantes do VIP de um jogador especifico - `celestialvip.infvip`.
+- `/gerarchave vip <vip> <dias>` - gerar uma chave de ativação do VIP com o número especificado de dias - `celestialvip.genkey`.
+- `/gerarchave cash <qtd>` - gerar uma chave de ativação de um valor específico de Cash - `celestialvip.genkey`.
+- `/listarchaves vip/cash` - listar todas as chaves ativas - `celestialvip.listkeys`.
+- `/apagarchave vip/cash <chave>` - apagar uma chave específica - `celestialvip.delkey`.
+- `/apagarchave vip/cash all` - apagar todas as chaves ativas - `celestialvip.delkey`.
+- `/darvip <jogador> <vip> <dias>/perm` - torna um jogador especifico em VIP - `celestialvip.givip`.
+- `/removervip <jogador> <grupo>` - tirar o VIP de um jogador específico - `celestialvip.remvip`.
+- `/celestialvip reload` - recarregar todas as configurações do plugin Celestial VIP - `celestialvip.reload`.
+
+## Permissões
+
+- `celestialvip.user` - Inclui `/resgatar`, `/usarchave` e `/infovip`.
+- `celestialvip.adm` - Inclui todos os outros comandos.
+
+
 
 ## Instalação
 
