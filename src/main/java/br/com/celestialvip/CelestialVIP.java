@@ -1,9 +1,6 @@
 package br.com.celestialvip;
 
-import br.com.celestialvip.commands.GenerateKeyCommand;
-import br.com.celestialvip.commands.ListKeysCommand;
-import br.com.celestialvip.commands.RedeemCommand;
-import br.com.celestialvip.commands.UseKeyCommand;
+import br.com.celestialvip.commands.*;
 import br.com.celestialvip.data.DatabaseManager;
 import br.com.celestialvip.data.repositories.CashRepository;
 import br.com.celestialvip.data.repositories.PlayerRepository;
@@ -51,6 +48,7 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
         getCommand("resgatar").setExecutor(new RedeemCommand());
         getCommand("usarchave").setExecutor(new UseKeyCommand());
         getCommand("listarchaves").setExecutor(new ListKeysCommand());
+        getCommand("infovip").setExecutor(new VipInfoCommand());
         checkVipExpiration();
     }
 
