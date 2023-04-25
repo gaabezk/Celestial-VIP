@@ -1,8 +1,7 @@
 config:
-  language: 'pt-BR'
+  prefix: '&6[CelestialVIP]'
   # in seconds - default = 1800 (30min)
   vip-expiration-check-interval: 1800
-  prefix: '&6[CelestialVIP]'
   announce:
     active: true
     # types: chat, actionbar, title
@@ -85,3 +84,31 @@ config:
       - '[console] cash set %player% %value%'
       - '[message] voce comprou %value% em cash'
       - '[sound] ENTITY_PLAYER_LEVELUP'
+  messages:
+    no_player_command: '&cEste comando só pode ser executado por um jogador.'
+    code_already_used: '&cEste código de pagamento já foi usado!'
+    payment_not_found: '&cPagamento não encontrado, verifique o código de pagamento e tente novamente mais tarde.'
+    no_vip_redeem: '&cEste não é um código VIP, por favor tente /resgatar cash <ID da transação>.'
+    no_cash_redeem: '&cEste não é um código cash, por favor tente /resgatar vip <ID da transação>.'
+    payment_not_approved: '&cPagamento ainda não foi aprovado, tente novamente mais tarde!'
+    incorrect_payment_format: '&cEste pagamento não está no formato correto, contate a STAFF!'
+    vip_already_active: '&cVocê já está no VIP &f{vip}.'
+    vip_already_active_other: '&c{player} já está no VIP &f{vip}.'
+    vip_not_active_other: '&c{player} não está no VIP &f{vip}.'
+    vip_group_not_found: '&co grupo VIP &f{vip} &cnão foi encontrado. Verifique se digitou corretamente e se o grupo está definido no plugin.'
+    remove_vip_success: '&aVip removido com sucesso!'
+    list_keys_empty: '&cNenhuma chave encontrada!'
+    list_keys_header: '&aLista de chaves:'
+    info_vip_header: '&aInformações VIP:'
+    player_not_online: '&f{player} &cprecisa estar online para ativar o VIP!'
+    vip_not_found: '&cNão foi encontrado nenhum VIP ativo para &f{player}.'
+    key_not_found: '&cEsta chave não existe!'
+    key_already_used: '&cEssa chave de ativação já foi usada!'
+    delete_all_keys_success: '&aTodas as chaves ativas foram apagadas com sucesso!'
+    delete_key_success: '&aChave apagada com sucesso!'
+    delete_key_error: '&cErro ao deletar a chave: &4{error_message}'
+    copy_key: '&6Clique para copiar a chave: &a{key}'
+    generate_key_success: '&aChave gerada com sucesso!'
+    generate_key_error: '&cErro ao criar a chave: &4{error_message}'
+    no_valid_days: '&cColoque um número de dias válido!'
+

@@ -3,16 +3,22 @@ package br.com.celestialvip.commands;
 import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.entities.Vip;
 import br.com.celestialvip.services.DeactivationService;
+import br.com.celestialvip.utils.Utilities;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 public class RemoveVipCommand implements CommandExecutor {
 
     private final DeactivationService deactivationService = new DeactivationService();
+    FileConfiguration config = CelestialVIP.getPlugin().getConfig();
+    String prefix = Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.prefix"))) + " ";
+
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
@@ -23,7 +29,7 @@ public class RemoveVipCommand implements CommandExecutor {
             List<Vip> vips = CelestialVIP.getVipRepository().getAllVipsByPlayerNick(args[0],true);
 
             if(vips.isEmpty()){
-                sender.sendMessage("§cEsse jogador nao possui vips ativos!");
+                sender.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.vip_not_found")).replace("{player}",args[0])));
                 return true;
             }
 
@@ -31,12 +37,12 @@ public class RemoveVipCommand implements CommandExecutor {
                 if(vip.getGroup().equals(args[1])){
                     deactivationService.deactivateVip(vip);
                     num++;
-                    sender.sendMessage("§aVip removido com sucesso!");
+                    sender.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.remove_vip_success"))));
                     return true;
                 }
             }
             if(num==0){
-                sender.sendMessage("§cEsse jogador nao possui o vip: §f" + args[1]);
+                sender.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.vip_not_active_other")).replace("{player}",args[0]).replace("{vip}",args[1])));
                 return true;
             }
         }

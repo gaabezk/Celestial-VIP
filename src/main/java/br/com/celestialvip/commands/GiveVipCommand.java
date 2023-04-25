@@ -2,11 +2,13 @@ package br.com.celestialvip.commands;
 
 import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.entities.Vip;
+import br.com.celestialvip.utils.Utilities;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.eclipse.aether.RepositoryException;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +18,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class GiveVipCommand implements CommandExecutor {
+
+    FileConfiguration config = CelestialVIP.getPlugin().getConfig();
+    String prefix = Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.prefix"))) + " ";
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
 
@@ -23,7 +29,7 @@ public class GiveVipCommand implements CommandExecutor {
 
             List<String> vipsGroupss = new ArrayList<>(Objects.requireNonNull(CelestialVIP.getPlugin().getConfig().getConfigurationSection("config.vips")).getKeys(false));
             if (!vipsGroupss.contains(args[1])) {
-                sender.sendMessage("Grupo vip nao existe!");
+                sender.sendMessage(prefix+ Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.vip_group_not_found")).replace("{vip}",args[1])));
                 return true;
             }
 
@@ -33,7 +39,7 @@ public class GiveVipCommand implements CommandExecutor {
             OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
 
             if(!player.isOnline()){
-                sender.sendMessage("§f"+player.getName()+" §cprecisa estar online para ativar o vip!");
+                sender.sendMessage(prefix+ Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.player_not_online")).replace("{player}", Objects.requireNonNull(player.getName()))));
                 return true;
             }
 
@@ -43,11 +49,11 @@ public class GiveVipCommand implements CommandExecutor {
                 try{
                     days = Integer.parseInt(args[2]);
                     if(days<=0){
-                        sender.sendMessage("Coloque um numero de dias válido!");
+                        sender.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.no_valid_days"))));
                         return true;
                     }
                 }catch (Exception e){
-                    sender.sendMessage("Coloque um numero de dias válido!");
+                    sender.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.no_valid_days"))));
                     return true;
                 }
             }
@@ -56,7 +62,7 @@ public class GiveVipCommand implements CommandExecutor {
 
             for(Vip vip : vips){
                 if(vip.getGroup().equals(group)){
-                    sender.sendMessage("§f"+player.getName()+" §cjá esta no vip §f" + vip.getGroup());
+                    sender.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.vip_already_active_other")).replace("{player}", Objects.requireNonNull(player.getName())).replace("{vip}",vip.getGroup())));
                     return true;
                 }
             }

@@ -3,9 +3,11 @@ package br.com.celestialvip.commands;
 import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.entities.PayamentStatus;
 import br.com.celestialvip.models.entities.Vip;
+import br.com.celestialvip.utils.Utilities;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.eclipse.aether.RepositoryException;
 import org.jetbrains.annotations.NotNull;
@@ -17,11 +19,14 @@ import java.util.Objects;
 
 public class RedeemCommand implements CommandExecutor {
 
+    FileConfiguration config = CelestialVIP.getPlugin().getConfig();
+    String prefix = Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.prefix"))) + " ";
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
         if (cmd.getName().equalsIgnoreCase("resgatar") && args.length == 2) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage("Este comando só pode ser executado por um jogador.");
+                sender.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.no_player_command"))));
                 return true;
             }
             Player player = (Player) sender;
@@ -44,7 +49,7 @@ public class RedeemCommand implements CommandExecutor {
         String code = CelestialVIP.getVipRepository().getMercadoPagoVipKey(args[1]);
 
         if (code != null) {
-            player.sendMessage("Essa chave ja foi usada!");
+            player.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.key_already_used"))));
             return true;
         }
 
@@ -56,7 +61,7 @@ public class RedeemCommand implements CommandExecutor {
         }
 
         if (result.getStatus() == null) {
-            player.sendMessage("Pagamento nao encontrado, verifique o codigo de pagamento e tente mais tarde");
+            player.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.payment_not_found"))));
             return true;
         }
 
@@ -67,18 +72,18 @@ public class RedeemCommand implements CommandExecutor {
                 .toArray(String[]::new);
 
         if (partes.length != 2) {
-            player.sendMessage("Essa não é uma chave vip, por favor tente /resgatar cash <id da transação>");
+            player.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.no_vip_redeem"))));
             return true;
         }
 
         if (!result.getStatus().equals("approved")) {
-            player.sendMessage("Pagamento ainda nao foi aprovado, tente novamente mais tarde!");
+            player.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.payment_not_approved"))));
             return true;
         }
 
         List<String> vipsGroups = new ArrayList<>(Objects.requireNonNull(CelestialVIP.getPlugin().getConfig().getConfigurationSection("config.vips")).getKeys(false));
         if (!vipsGroups.contains(partes[0])) {
-            player.sendMessage("Me desculpe, parece que a staff deixou passar um pequeno erro e seu vip terá que ser ativo manualmente, contate um de nossos Staffs para lhe ajudar!");
+            player.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.incorrect_payment_format"))));
             return true;
         }
 
@@ -89,7 +94,7 @@ public class RedeemCommand implements CommandExecutor {
 
         for(Vip vip : vips){
             if(vip.getGroup().equals(partes[0])){
-                player.sendMessage("Voce ja esta no vip " + vip.getGroup());
+                player.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.vip_already_active")).replace("{vip",vip.getGroup())));
                 return true;
             }
         }
@@ -109,7 +114,7 @@ public class RedeemCommand implements CommandExecutor {
         String code = CelestialVIP.getCashRepository().getMercadoPagoCashCode(args[1]);
 
         if (code != null) {
-            player.sendMessage("Essa chave ja foi usada!");
+            player.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.key_already_used"))));
             return true;
         }
 
@@ -122,7 +127,7 @@ public class RedeemCommand implements CommandExecutor {
 
 
         if (result.getStatus() == null) {
-            player.sendMessage("Pagamento nao encontrado, verifique o codigo de pagamento e tente mais tarde");
+            player.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.payment_not_found"))));
             return true;
         }
 
@@ -133,12 +138,12 @@ public class RedeemCommand implements CommandExecutor {
                 .toArray(String[]::new);
 
         if (partes.length != 1) {
-            player.sendMessage("Essa não é uma chave de cash, por favor tente /resgatar vip <id da transação>");
+            player.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.no_cash_redeem"))));
             return true;
         }
 
         if (!result.getStatus().equals("approved")) {
-            player.sendMessage("Pagamento ainda nao foi aprovado, tente novamente mais tarde!");
+            player.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.payment_not_approved"))));
             return true;
         }
 

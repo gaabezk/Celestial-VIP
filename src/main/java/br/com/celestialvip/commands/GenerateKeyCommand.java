@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
@@ -21,6 +22,9 @@ import java.util.Set;
 
 
 public class GenerateKeyCommand implements CommandExecutor {
+
+    FileConfiguration config = CelestialVIP.getPlugin().getConfig();
+    String prefix = Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.prefix"))) + " ";
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
@@ -48,13 +52,13 @@ public class GenerateKeyCommand implements CommandExecutor {
             CelestialVIP.getCashRepository().saveCashKey(cashKey);
 
             Component component = Component.text(cashKey.toString())
-                    .hoverEvent(HoverEvent.showText(Component.text("Clique para copiar a chave: "+cashKey.getKeyCode())))
+                    .hoverEvent(HoverEvent.showText(Component.text(Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.copy_key")).replace("{key}",cashKey.getKeyCode())))))
                     .clickEvent(ClickEvent.copyToClipboard(cashKey.getKeyCode()));
-            sender.sendMessage("\n§aChave gerada com sucesso!");
+            sender.sendMessage("\n"+prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.generate_key_success"))));
             sender.sendMessage(component);
 
         } catch (Exception e) {
-            Bukkit.getLogger().info(("Erro ao criar a chave cash: " + e.getMessage()));
+            Bukkit.getLogger().info(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.generate_key_error")).replace("{error_message}",e.getMessage())));
         }
         return true;
     }
@@ -74,11 +78,11 @@ public class GenerateKeyCommand implements CommandExecutor {
                 try{
                     days = Integer.parseInt(args[2]);
                     if(days<=0){
-                        sender.sendMessage("Coloque um numero de dias válido!");
+                        sender.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.no_valid_days"))));
                         return true;
                     }
                 }catch (Exception e){
-                    sender.sendMessage("Coloque um numero de dias válido!");
+                    sender.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.no_valid_days"))));
                     return true;
                 }
             }
@@ -95,16 +99,16 @@ public class GenerateKeyCommand implements CommandExecutor {
                 CelestialVIP.getVipRepository().saveVipKey(vipKey);
 
                 Component component = Component.text(vipKey.toString())
-                        .hoverEvent(HoverEvent.showText(Component.text("Clique para copiar a chave: "+vipKey.getKeyCode())))
+                        .hoverEvent(HoverEvent.showText(Component.text(Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.copy_key")).replace("{key}",vipKey.getKeyCode())))))
                         .clickEvent(ClickEvent.copyToClipboard(vipKey.getKeyCode()));
-                sender.sendMessage("\n§aChave gerada com sucesso!");
+                sender.sendMessage("\n"+prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.generate_key_success"))));
                 sender.sendMessage(component);
 
             } catch (Exception e) {
-                Bukkit.getLogger().info(("Erro ao criar a chave vip: " + e.getMessage()));
+                Bukkit.getLogger().info(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.generate_key_error")).replace("{error_message}",e.getMessage())));
             }
         } else {
-            sender.sendMessage("Erro: o grupo VIP " + args[0] + " não foi encontrado. Verifique se digitou corretamente e se o grupo está definido no plugin.");
+            sender.sendMessage(prefix+Utilities.translateColorCodes(Objects.requireNonNull(config.getString("config.messages.vip_group_not_found")).replace("{vip}",args[1])));
         }
         return true;
     }

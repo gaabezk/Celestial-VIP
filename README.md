@@ -54,13 +54,11 @@ jogador ao ativar um vip.
 
 ### Opções disponíveis
 
-- `language`: define a linguagem usada pelo plugin. As opções disponíveis atualmente são pt-BR (português brasileiro) e
-  en-US (inglês).
 - `prefix`: adiciona um prefixo às mensagens do plugin.
 - `announce`: configura como as ativações dos vips serão anunciadas. É possível escolher um ou mais tipos de anúncio,
-  como chat, actionBar, título ou bossbar.
+  como chat, actionBar ou title.
 - `key-size`: define o tamanho das chaves usadas para ativar vips.
-- `database`: escolhe um tipo de banco de dados (mysql ou postgresql) e define as credenciais necessárias para
+- `database`: escolhe um tipo de banco de dados (sqlite, mysql ou postgresql) e define as credenciais necessárias para
   acessá-lo.
 - `mercadopago`: configura as credenciais de acesso ao MercadoPago.
 - `vips`: define as características de cada vip, como o nome do grupo, a tag usada, se expira ou não, os comandos a
