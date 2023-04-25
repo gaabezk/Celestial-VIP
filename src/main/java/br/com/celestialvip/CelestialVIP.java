@@ -49,6 +49,7 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
         getCommand("usarchave").setExecutor(new UseKeyCommand());
         getCommand("listarchaves").setExecutor(new ListKeysCommand());
         getCommand("infovip").setExecutor(new VipInfoCommand());
+        getCommand("apagarchave").setExecutor(new DeleteKeyCommand());
         checkVipExpiration();
     }
 

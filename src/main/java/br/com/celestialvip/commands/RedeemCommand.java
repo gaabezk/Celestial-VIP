@@ -3,23 +3,17 @@ package br.com.celestialvip.commands;
 import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.entities.PayamentStatus;
 import br.com.celestialvip.models.entities.Vip;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.title.Title;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.conversations.Prompt;
 import org.bukkit.entity.Player;
 import org.eclipse.aether.RepositoryException;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 public class RedeemCommand implements CommandExecutor {
 
