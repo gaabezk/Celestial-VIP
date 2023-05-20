@@ -1,7 +1,7 @@
 # Celestial VIP
 
-O Celestial VIP é um plugin para servidores de Minecraft que oferece recursos de VIP, incluindo a possibilidade de
-resgatar VIP ou Cash, gerar chaves de ativação e monitorar o tempo restante do VIP.
+O Celestial VIP é um plugin que oferece recursos de VIP, incluindo a possibilidade de
+resgatar VIP ou Cash, gerar chaves de ativação, monitorar o tempo restante do VIP, entre outros...
 
 ## Recursos
 

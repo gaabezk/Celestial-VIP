@@ -42,6 +42,7 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
     public void onEnable() {
         plugin = this;
         getLogger().info("\033[92mBy: gabezk | Obrigado por usar!\033[0m");
+        getConfig().options().copyDefaults();
         saveDefaultConfig(); // cria o arquivo de configuração padrão se ele não existir
         getCommand("celestialvip").setExecutor(this);
         getCommand("gerarchave").setExecutor(new GenerateKeyCommand());
@@ -65,7 +66,8 @@ public final class CelestialVIP extends JavaPlugin implements CommandExecutor {
             try {
                 databaseManager.getConnection().close();
                 cancelTimer();
-                saveDefaultConfig();
+                getConfig().options().copyDefaults();
+                saveDefaultConfig(); // cria o arquivo de configuração padrão se ele não existir
                 reloadConfig();
                 databaseManager = new DatabaseManager();
                 mercadoPagoAPI = new MercadoPagoAPI();
