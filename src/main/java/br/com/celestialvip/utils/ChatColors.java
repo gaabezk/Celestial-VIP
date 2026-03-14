@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import lombok.Getter;
 
 /**
  * Simplistic enumeration of all supported color values for chat.
@@ -129,13 +128,11 @@ public final class ChatColors
      * This colour's colour char prefixed by the {@link #COLOR_CHAR}.
      */
     private final String toString;
-    @Getter
     private final String name;
     private final int ordinal;
     /**
      * The RGB color of the ChatColors. null for non-colors (formatting)
      */
-    @Getter
     private final Color color;
 
     private ChatColors(char code, String name)
@@ -194,6 +191,10 @@ public final class ChatColors
     {
         return toString;
     }
+
+    public String getName() { return name; }
+
+    public Color getColor() { return color; }
 
     /**
      * Strips the given message of all color codes
