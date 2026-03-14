@@ -1,6 +1,5 @@
 package br.com.celestialvip.data.repositories;
 
-import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.entities.Vip;
 import br.com.celestialvip.models.keys.VipKey;
 import org.slf4j.Logger;
@@ -11,12 +10,27 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class VipRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(VipRepository.class);
-    private final DataSource dataSource = CelestialVIP.getDatabaseManager().getDataSource();
-    private final String prefix = CelestialVIP.getPlugin().getConfig().getString("config.database.tb_prefix");
+    private final DataSource dataSource;
+    private final String prefix;
+    private final ConcurrentHashMap<String, List<Vip>> vipCache = new ConcurrentHashMap<>();
+    private long lastCacheUpdate = 0;
+    private final long cacheDurationMillis;
+
+    public VipRepository(DataSource dataSource, String prefix, int cacheDurationSeconds) {
+        this.dataSource = dataSource;
+        this.prefix = prefix != null ? prefix : "";
+        this.cacheDurationMillis = TimeUnit.SECONDS.toMillis(cacheDurationSeconds);
+    }
+
+    public long getLastCacheUpdate() {
+        return lastCacheUpdate;
+    }
 
     public void saveVip(Vip vip) {
         String sql = "INSERT INTO " + prefix + "vip (player_nick, vip_group, is_active, vip_days, is_permanent, creation_date, expiration_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -35,6 +49,7 @@ public class VipRepository {
             }
 
             statement.executeUpdate();
+            vipCache.clear(); // Invalidate cache on save
         } catch (SQLException e) {
             logger.error("Error while saving vip to database", e);
         }
@@ -57,12 +72,18 @@ public class VipRepository {
             }
             statement.setInt(8, vip.getId());
             statement.executeUpdate();
+            vipCache.clear(); // Invalidate cache on update
         } catch (SQLException e) {
             logger.error("Error while updating vip in database", e);
         }
     }
 
-    public List<Vip> getAllVips(boolean active,boolean permanent) {
+    public List<Vip> getAllVips(boolean active, boolean permanent) {
+        String cacheKey = "all_" + active + "_" + permanent;
+        long now = System.currentTimeMillis();
+        if (vipCache.containsKey(cacheKey) && (now - lastCacheUpdate) < cacheDurationMillis) {
+            return new ArrayList<>(vipCache.get(cacheKey));
+        }
         List<Vip> vips = new ArrayList<>();
         String sql = "SELECT * FROM " + prefix + "vip WHERE is_active = ? AND is_permanent = ?";
         try (Connection connection = dataSource.getConnection();
@@ -77,6 +98,8 @@ public class VipRepository {
         } catch (SQLException e) {
             logger.error("Error while getting vips by player nick from database", e);
         }
+        vipCache.put(cacheKey, new ArrayList<>(vips));
+        lastCacheUpdate = now;
         return vips;
     }
 

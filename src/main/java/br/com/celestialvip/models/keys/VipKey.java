@@ -1,16 +1,7 @@
 package br.com.celestialvip.models.keys;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDate;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class VipKey {
     private String keyCode;
     private String usedBy;
@@ -19,6 +10,36 @@ public class VipKey {
     private boolean isActive;
     private boolean isPermanent;
     private LocalDate creationDate;
+
+    public VipKey() {}
+
+    public VipKey(String keyCode, String usedBy, String vipName, int durationInDays, boolean isActive, boolean isPermanent, LocalDate creationDate) {
+        this.keyCode = keyCode;
+        this.usedBy = usedBy;
+        this.vipName = vipName;
+        this.durationInDays = durationInDays;
+        this.isActive = isActive;
+        this.isPermanent = isPermanent;
+        this.creationDate = creationDate;
+    }
+
+    public String getKeyCode() { return keyCode; }
+
+    public String getUsedBy() { return usedBy; }
+
+    public String getVipName() { return vipName; }
+
+    public int getDurationInDays() { return durationInDays; }
+
+    public boolean isActive() { return isActive; }
+
+    public boolean isPermanent() { return isPermanent; }
+
+    public LocalDate getCreationDate() { return creationDate; }
+
+    public void setUsedBy(String usedBy) { this.usedBy = usedBy; }
+
+    public void setActive(boolean active) { isActive = active; }
 
     @Override
     public String toString() {

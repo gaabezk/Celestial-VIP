@@ -1,7 +1,17 @@
 config:
   prefix: '&6[CelestialVIP]'
+  # timezone for VIP expiration (e.g. America/Sao_Paulo, UTC)
+  timezone: 'America/Sao_Paulo'
   # in seconds - default = 1800 (30min)
   vip-expiration-check-interval: 1800
+  # cache duration in seconds for VIP queries - default = 60 (1 min, reduce for less stale data)
+  cache-duration-seconds: 10
+  # Database backups (only works for sqlite)
+  backup:
+    enabled: true
+    # interval in hours between backups
+    interval-hours: 24
+
   announce:
     active: true
     # types: chat, actionbar, title
@@ -38,6 +48,10 @@ config:
   vips:
     diamond:
       tag: '&bVIP DIAMOND'
+      # price per day in cash units (used by /celestialvip renew)
+      price-per-day: 5
+      # if false, players cannot renew this VIP via /celestialvip renew
+      renewable: true
       after-expiration-commands:
         - '[console] lp user %player% parent remove %group%'
       activation-commands:
@@ -97,11 +111,30 @@ config:
     vip_not_active_other: '&c{player} não está no VIP &f{vip}.'
     vip_group_not_found: '&co grupo VIP &f{vip} &cnão foi encontrado. Verifique se digitou corretamente e se o grupo está definido no plugin.'
     remove_vip_success: '&aVip removido com sucesso!'
+    give_vip_success: '&aVIP concedido com sucesso!'
     list_keys_empty: '&cNenhuma chave encontrada!'
     list_keys_header: '&aLista de chaves:'
     info_vip_header: '&aInformações VIP:'
     player_not_online: '&f{player} &cprecisa estar online para ativar o VIP!'
     vip_not_found: '&cNão foi encontrado nenhum VIP ativo para &f{player}.'
+    vip_not_renewable: '&cEste VIP não permite renovação.'
+    vip_renew_success: '&aVIP &f{group} &arenovado por {days} dia(s)! &7(expira: &f{expiration}&7)'
+    vip_list_header: '&aVIPs ativos:'
+    no_permission: '&cVocê não tem permissão para usar este comando.'
+    vip_list_entry: '&e{player} &7- &f{group} &7| &f{expiration} &7| &f{daysleft} dias restantes'
+    command_help_header: '&6=== CelestialVIP - Comandos Disponíveis ==='
+    command_help_user_resgatar: '&e/resgatar <vip/cash> <id> &7- Resgata VIP ou Cash via MercadoPago'
+    command_help_user_usarchave: '&e/usarchave <vip/cash> <chave> &7- Usa uma chave de ativação'
+    command_help_user_infovip: '&e/infovip [jogador] &7- Mostra informações dos VIPs'
+    command_help_admin_title: '&cComandos Administrativos:'
+    command_help_admin_renew: '&e/celestialvip renew <jogador> <grupo> <dias> &7- Renova o VIP de um jogador'
+    command_help_admin_listvips: '&e/celestialvip listvips &7- Lista todos os VIPs ativos'
+    command_help_admin_reload: '&e/celestialvip reload &7- Recarrega configurações'
+    command_help_admin_check: '&e/celestialvip check &7- Verifica VIPs expirados agora'
+    command_usage_renew: '&cUso: /celestialvip renew <jogador> <grupo> <dias>'
+    command_usage_listvips: '&cUso: /celestialvip listvips'
+    command_no_vips: '&cNenhum VIP ativo encontrado.'
+    command_check_success: '&aVerificação de VIPs expirados executada!'
     key_not_found: '&cEsta chave não existe!'
     key_already_used: '&cEssa chave de ativação já foi usada!'
     delete_all_keys_success: '&aTodas as chaves ativas foram apagadas com sucesso!'
@@ -111,4 +144,15 @@ config:
     generate_key_success: '&aChave gerada com sucesso!'
     generate_key_error: '&cErro ao criar a chave: &4{error_message}'
     no_valid_days: '&cColoque um número de dias válido!'
-
+    reload_error: '&cErro ao recarregar: {error}'
+    reload_success: '&aConfigurações recarregadas com sucesso!'
+    usage_delete_key: '&6Uso: /apagarchave vip <chave/all> ou /apagarchave cash <chave/all>'
+    usage_give_vip: '&6Uso: /darvip <jogador> <grupo> <dias/perm>'
+    available_groups: '&7Grupos VIP disponíveis: {groups}'
+    usage_generate_key: '&6Uso: /gerarchave vip <grupo> <dias/perm> ou /gerarchave cash <quantia>'
+    usage_vip_info: '&6Uso: /infovip [jogador]'
+    vip_expired: '&cSeu VIP ''{group}'' expirou!'
+    usage_redeem: '&6Uso: /resgatar vip <id_transacao> ou /resgatar cash <id_transacao>'
+    usage_use_key: '&6Uso: /usarchave vip <chave> ou /usarchave cash <chave>'
+    usage_list_keys: '&6Uso: /listarchaves vip ou /listarchaves cash'
+    usage_remove_vip: '&6Uso: /removervip <jogador> <grupo>'

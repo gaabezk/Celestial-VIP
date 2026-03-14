@@ -1,6 +1,5 @@
 package br.com.celestialvip.data.repositories;
 
-import br.com.celestialvip.CelestialVIP;
 import br.com.celestialvip.models.keys.CashKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,16 +10,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class CashRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(VipRepository.class);
-    private final DataSource dataSource = CelestialVIP.getDatabaseManager().getDataSource();
-    private final String prefix = CelestialVIP.getPlugin().getConfig().getString("config.database.tb_prefix");
+    private static final Logger logger = LoggerFactory.getLogger(CashRepository.class);
+    private final DataSource dataSource;
+    private final String prefix;
+
+    public CashRepository(DataSource dataSource, String prefix) {
+        this.dataSource = dataSource;
+        this.prefix = prefix != null ? prefix : "";
+    }
 
 
     public void saveMercadoPagoCashCode(String mercadoPagoCashKey, String playerNick) {
@@ -61,7 +63,7 @@ public class CashRepository {
             statement.setString(2, cashKey.getUsedBy());
             statement.setInt(3, cashKey.getAmountOfCash());
             statement.setBoolean(4, cashKey.isActive());
-            statement.setObject(5, Date.from(cashKey.getCreationDate().atStartOfDay(ZoneId.of("America/Sao_Paulo")).toInstant()));
+            statement.setDate(5, java.sql.Date.valueOf(cashKey.getCreationDate()));
             statement.executeUpdate();
         } catch (SQLException e) {
             logger.error("Error while saving cash key to database", e);

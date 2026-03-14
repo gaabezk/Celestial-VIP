@@ -1,71 +1,85 @@
 package br.com.celestialvip.services;
 
-import br.com.celestialvip.CelestialVIP;
+import br.com.celestialvip.config.PluginConfig;
+import br.com.celestialvip.data.repositories.VipRepository;
 import br.com.celestialvip.models.entities.Vip;
 import br.com.celestialvip.utils.Utilities;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import java.time.ZoneId;
 import java.util.List;
-import java.util.TimerTask;
 
-import static org.bukkit.Bukkit.getLogger;
+/**
+ * Runnable to be executed on the main thread via Bukkit.getScheduler().runTaskTimer(...).
+ */
+public class DeactivationService implements Runnable {
 
-public class DeactivationService extends TimerTask {
-    private final FileConfiguration config = CelestialVIP.getPlugin().getConfig();
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
+    private final PluginConfig config;
+    private final VipRepository vipRepository;
+    private final JavaPlugin plugin;
+
+    public DeactivationService(PluginConfig config, VipRepository vipRepository, JavaPlugin plugin) {
+        this.config = config;
+        this.vipRepository = vipRepository;
+        this.plugin = plugin;
+    }
 
     @Override
     public void run() {
-
-        getLogger().info("\033[93m[CelestialVIP] \033[92mBuscando por VIPS expirados...\033[0m");
+        ZoneId zoneId = ZoneId.of(config.getTimezone());
+        List<Vip> vips = vipRepository.getAllVips(true, false);
         int expireds = 0;
-        List<Vip> vips = CelestialVIP.getVipRepository().getAllVips(true,false);
         for (Vip vip : vips) {
-            if (vip.isVipExpired()) {
+            if (vip.isVipExpired(zoneId)) {
                 expireds++;
                 deactivateVip(vip);
             }
         }
-        if(expireds==0){
-            getLogger().info("\033[93m[CelestialVIP] \033[92mNenhum VIP expirado encontrado.\033[0m");
-        }else{
-            getLogger().info("\033[93m[CelestialVIP] \033[92mForam encontrados \033[93m"+expireds+"\033[92m VIPS expirados.\033[0m");
+        if (expireds == 0) {
+            plugin.getLogger().info("\033[32m[CelestialVIP] Nenhum VIP expirado encontrado.\033[0m");
+        } else {
+            plugin.getLogger().info("\033[32m[CelestialVIP] Foram encontrados " + expireds + " VIPS expirados.\033[0m");
         }
     }
 
-    public void deactivateVip(Vip vip){
-        ConfigurationSection vipSection = config.getConfigurationSection("config.vips." + vip.getGroup());
-        if (vipSection != null) {
+    public void deactivateVip(Vip vip) {
+        ConfigurationSection vipSection = config.getRaw().getConfigurationSection("config.vips." + vip.getGroup());
+        if (vipSection == null) {
+            // If the VIP group was removed from config, still deactivate the VIP record.
             vip.setActive(false);
-            CelestialVIP.getVipRepository().updateVip(vip);
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(vip.getPlayerNick());
-            List<String> activationCommands = vipSection.getStringList("after-expiration-commands");
+            vipRepository.updateVip(vip);
+            plugin.getLogger().warning("\033[33mVIP group '" + vip.getGroup() + "' não existe mais na config; desativando VIP do jogador " + vip.getPlayerNick() + ".\033[0m");
+            return;
+        }
+        vip.setActive(false);
+        vipRepository.updateVip(vip);
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(vip.getPlayerNick());
+        List<String> commands = config.getVipAfterExpirationCommands(vip.getGroup());
 
-            for (String command : activationCommands) {
-                command = replaceVipVariables(command, offlinePlayer.getName(), "" + vip.getVipDays(), vip.getGroup(), vipSection);
-                if (command.startsWith("[console] ")) {
-                    command = command.replace("&", "§");
-                    String finalCommand = command;
-                    Bukkit.getScheduler().runTask(CelestialVIP.getPlugin(CelestialVIP.class), () -> {
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand.substring(10));
-                    });
+        // Notify the player if online
+        if (offlinePlayer.isOnline() && offlinePlayer.getPlayer() != null) {
+            offlinePlayer.getPlayer().sendMessage(LEGACY.deserialize("§cSeu VIP '" + vip.getGroup() + "' expirou!"));
+        }
 
-                } else if (command.startsWith("[player] ")) {
-                    if (offlinePlayer.isOnline()) {
-                        Bukkit.getPlayer(offlinePlayer.getName()).performCommand(command.substring(9));
-                    }
-                } else if (command.startsWith("[message] ")) {
-                    if (offlinePlayer.isOnline()) {
-                        command = command.replace("&", "§");
-                        Bukkit.getPlayer(offlinePlayer.getName()).sendMessage(command.substring(10));
-                    }
-                } else if (command.startsWith("[sound] ")){
-                    if (offlinePlayer.isOnline()) {
-                        Bukkit.getPlayer(offlinePlayer.getName()).playSound(Bukkit.getPlayer(offlinePlayer.getName()).getLocation(), Sound.valueOf(command.substring(8).toUpperCase()), 1.0f, 1.0f);
-                    }
+        for (String command : commands) {
+            command = replaceVipVariables(command, offlinePlayer.getName(), String.valueOf(vip.getVipDays()), vip.getGroup(), vipSection);
+            if (command.startsWith("[console] ")) {
+                String finalCommand = command.replace("&", "§").substring(10);
+                Bukkit.getScheduler().runTask(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand));
+            } else if (command.startsWith("[player] ") && offlinePlayer.isOnline() && offlinePlayer.getPlayer() != null) {
+                offlinePlayer.getPlayer().performCommand(command.substring(9));
+            } else if (command.startsWith("[message] ") && offlinePlayer.isOnline() && offlinePlayer.getPlayer() != null) {
+                offlinePlayer.getPlayer().sendMessage(LEGACY.deserialize(command.replace("&", "§").substring(10)));
+            } else if (command.startsWith("[sound] ") && offlinePlayer.isOnline() && offlinePlayer.getPlayer() != null) {
+                try {
+                    offlinePlayer.getPlayer().playSound(offlinePlayer.getPlayer().getLocation(), Sound.valueOf(command.substring(8).trim().toUpperCase()), 1.0f, 1.0f);
+                } catch (IllegalArgumentException ignored) {
                 }
             }
         }
@@ -75,9 +89,8 @@ public class DeactivationService extends TimerTask {
         message = message.replace("%player%", playerNick);
         message = message.replace("%days%", days);
         message = message.replace("%group%", vipType);
-        message = message.replace("%tag%", Utilities.translateColorCodes(vipSection.getString("tag")));
-
+        String tag = vipSection.getString("tag");
+        message = message.replace("%tag%", tag != null ? Utilities.translateColorCodes(tag) : vipType);
         return message;
     }
-
 }
